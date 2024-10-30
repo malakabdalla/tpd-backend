@@ -20,8 +20,11 @@ from speech import synthesize_speech_with_specific_voice
 from ai_functions import ai_answer_question, word_helper
 from functools import partial
 from timeout_decorator import timeout
+import webrtcvad
 
-logging.basicConfig(level=logging.INFO)
+
+logging.basicConfig(level=logging.DEBUG)
+
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
@@ -30,14 +33,15 @@ socketio = SocketIO(
     app,
     cors_allowed_origins="*",
     async_mode='threading',
-    logger=True,
-    engineio_logger=True,
+    logger=False,
+    engineio_logger=False,
     ping_timeout=60,
     ping_interval=25,
     max_http_buffer_size=1e8,
     always_connect=True,
     http_compression=False
 )
+
 
 
 class AudioStreamHandler:
@@ -50,16 +54,38 @@ class AudioStreamHandler:
         self.silence_timer = None
         self.is_recording = False
         self.audio_levels = []  
-        self.silence_threshold = 500  # Adjusted threshold for silence detection
+        self.silence_threshold = 100  # was 500 Adjusted threshold for silence detection
         self.min_audio_chunks = 3  # Minimum number of chunks to calculate average
+        self.timeout_duration = 1
+        self.timeout_thread = None
         try:
             self.client = speech.SpeechClient()
         except Exception as e:
             logger.error(f"Failed to initialize Speech client: {e}")
             raise
 
+
+    def timeout_action(self):
+        """Function to call when timeout occurs."""
+        logger.isEnabledFor(logging.DEBUG)
+        logger.debug(f"Timeout occurred for client {self.socket_id}")
+        # self.emit_error("No audio input for too long. Stream will be closed.")
+        self.close()
+        self.emit_timeout()
+
+    def start_timeout(self):
+        """Start a timeout thread that will call timeout_action."""
+        # Cancel the existing timer if it is running
+        if self.timeout_thread is not None:
+            self.timeout_thread.cancel()
+
+        # Start a new timer
+        self.timeout_thread = threading.Timer(self.timeout_duration, self.timeout_action)
+        self.timeout_thread.start()
+
     def start_silence_detection(self):
         """Start the silence detection timer"""
+        logger.info(f"Starting silence detection for client {self.socket_id}")
         self.is_recording = True
         self.audio_levels = []
         self.reset_silence_timer()
@@ -74,6 +100,7 @@ class AudioStreamHandler:
 
     def handle_silence(self):
         """Handle silence detection with improved noise filtering"""
+        logger.isEnabledFor(logging.DEBUG)
         if self.is_recording and not self.closed:
             time_since_last_audio = datetime.now() - self.last_audio_time
             
@@ -84,7 +111,7 @@ class AudioStreamHandler:
                 
                 # Check if average level is below threshold and enough time has passed
                 if avg_level < self.silence_threshold and time_since_last_audio.total_seconds() >= 2:
-                    # logger.info(f"Silence detected for client {self.socket_id} (avg level: {avg_level})")
+                    logger.debug(f"Silence detected for client {self.socket_id} (avg level: {avg_level})")
                     socketio.emit('stop_recording', {'reason': 'silence_detected'}, room=self.socket_id)
                     self.close()
                 else:
@@ -95,16 +122,11 @@ class AudioStreamHandler:
                 self.reset_silence_timer()
         
     def add_chunk(self, chunk):
+        # logger.info(f"Received audio chunk from client {self.socket_id}")
+        logger.isEnabledFor(logging.DEBUG)
         """Add an audio chunk to the buffer and update audio levels"""
         if not self.closed:
             try:
-                # Calculate audio level from chunk
-                audio_level = sum(abs(byte) for byte in chunk) / len(chunk)
-                
-                # Keep track of recent audio levels (last 5 chunks)
-                self.audio_levels.append(audio_level)
-                if len(self.audio_levels) > 5:
-                    self.audio_levels.pop(0)
 
                 self.buffer.put(chunk, timeout=5)
                 self.reset_silence_timer()
@@ -138,6 +160,8 @@ class AudioStreamHandler:
                 return
 
     def emit_transcription(self, transcript):
+        logger.isEnabledFor(logging.DEBUG)
+        # logger.debug(f"Transcription: {transcript}")
         """Emit transcription using Socket.IO."""
         try:
             socketio.emit('transcription', {'transcript': transcript}, room=self.socket_id)
@@ -148,6 +172,13 @@ class AudioStreamHandler:
         """Emit error using Socket.IO."""
         try:
             socketio.emit('error', {'message': error_message}, room=self.socket_id)
+        except Exception as e:
+            logger.error(f"Failed to emit error: {e}")
+
+    def emit_timeout(self):
+        """Emit Timeout"""
+        try:
+            socketio.emit('timeout', {'message': 'timeout'}, room=self.socket_id)
         except Exception as e:
             logger.error(f"Failed to emit error: {e}")
 
@@ -175,6 +206,7 @@ def handle_disconnect():
 
 @socketio.on("start_audio_stream")
 def start_audio_stream():
+    logger.isEnabledFor(logging.DEBUG)
     """Initialize a new audio stream for transcription."""
     try:
         # Clean up any existing stream for this client
@@ -214,11 +246,22 @@ def start_audio_stream():
                     requests
                 )
 
+                empty_results_count = 0
+                # current_transcript = ""
+
                 for response in responses:
                     if handler.closed:
+                        logger.info(f"Stream closed for client {handler.socket_id}")
                         break
 
+                    if handler.timeout_thread is not None:
+                        handler.timeout_thread.cancel()
+                    handler.start_timeout()
+
+                    # logger.debug(f"Response received: {response}")  # Log full response
+                    # logger.debug(f"Number of results: {len(response.results)}")
                     if not response.results:
+                        logger.isEnabledFor(logging.DEBUG)
                         continue
 
                     result = response.results[0]
@@ -227,13 +270,15 @@ def start_audio_stream():
 
                     transcript = result.alternatives[0].transcript
 
-                    if result.is_final or result.stability > 0.2:
+                    if result.is_final or result.stability > 0.8:
+                        logger.debug(f"result is_final Transcript: {transcript}")
                         handler.emit_transcription(transcript)
 
             except Exception as e:
                 logger.error(f"Error in process_audio_stream: {str(e)}")
                 handler.emit_error(f"Transcription error: {str(e)}")
                 handler.close()
+
 
         # Start processing in a separate thread
         threading.Thread(
@@ -263,8 +308,10 @@ def handle_audio_chunk(data):
 @socketio.on("stop_audio_stream")
 def stop_audio_stream():
     """Stop the audio stream and clean up resources."""
+    logger.isEnabledFor(logging.DEBUG)
     try:
         if request.sid in active_streams:
+            logger.debug(f"Stopping audio stream for client {request.sid}")
             stream = active_streams[request.sid]
             stream.close()
             del active_streams[request.sid]
@@ -363,7 +410,7 @@ def word_helper_api():
 #     socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True, debug=True)
     # Start HTTP server in a separate thread
     # http_thread = threading.Thread(target=run_http_server)
     # http_thread.start()
