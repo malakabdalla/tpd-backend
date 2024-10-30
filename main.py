@@ -1,26 +1,19 @@
-import os
 from flask_socketio import SocketIO, emit
 from google.cloud import speech
 import queue
 import threading
 import base64
-import time
 from datetime import datetime
 import logging
 from engineio.async_drivers import threading as async_threading
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-# from MySQLcalls import MySQLCalls
-# from transcribe import transcribe_audio
 import json
-# import os
 import re
 from speech import synthesize_speech_with_specific_voice
-# import base64
 from ai_functions import ai_answer_question, word_helper
 from functools import partial
 from timeout_decorator import timeout
-import webrtcvad
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -28,7 +21,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app, origins="*", supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 socketio = SocketIO(
     app,
     cors_allowed_origins="*",
