@@ -159,7 +159,7 @@ Ensure that all information is appropriate for adult learners and avoids overly 
         )
 
         response = q_and_a.chat(
-        f"Query: {message}\n\nSaves generated questions in JSON format.",
+        # f"Query: {message}\n\nSaves generated questions in JSON format.",
         should_print=False,
         clear_after_response=False
     )

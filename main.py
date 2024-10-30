@@ -50,11 +50,8 @@ class AudioStreamHandler:
         self.sample_rate = sample_rate
         self.buffer = queue.Queue()
         self.closed = False
-        self.last_audio_time = datetime.now()
-        self.silence_timer = None
         self.is_recording = False
         self.audio_levels = []  
-        self.silence_threshold = 100  # was 500 Adjusted threshold for silence detection
         self.min_audio_chunks = 3  # Minimum number of chunks to calculate average
         self.timeout_duration = 1
         self.timeout_thread = None
@@ -69,67 +66,22 @@ class AudioStreamHandler:
         """Function to call when timeout occurs."""
         logger.isEnabledFor(logging.DEBUG)
         logger.debug(f"Timeout occurred for client {self.socket_id}")
-        # self.emit_error("No audio input for too long. Stream will be closed.")
         self.close()
         self.emit_timeout()
 
     def start_timeout(self):
         """Start a timeout thread that will call timeout_action."""
-        # Cancel the existing timer if it is running
         if self.timeout_thread is not None:
             self.timeout_thread.cancel()
-
-        # Start a new timer
         self.timeout_thread = threading.Timer(self.timeout_duration, self.timeout_action)
         self.timeout_thread.start()
-
-    def start_silence_detection(self):
-        """Start the silence detection timer"""
-        logger.info(f"Starting silence detection for client {self.socket_id}")
-        self.is_recording = True
-        self.audio_levels = []
-        self.reset_silence_timer()
-
-    def reset_silence_timer(self):
-        """Reset the silence detection timer"""
-        self.last_audio_time = datetime.now()
-        if self.silence_timer:
-            self.silence_timer.cancel()
-        self.silence_timer = threading.Timer(2.0, self.handle_silence)
-        self.silence_timer.start()
-
-    def handle_silence(self):
-        """Handle silence detection with improved noise filtering"""
-        logger.isEnabledFor(logging.DEBUG)
-        if self.is_recording and not self.closed:
-            time_since_last_audio = datetime.now() - self.last_audio_time
-            
-            # Only check for silence if we have enough audio samples
-            if len(self.audio_levels) >= self.min_audio_chunks:
-                # Calculate average of recent audio levels
-                avg_level = sum(self.audio_levels) / len(self.audio_levels)
-                
-                # Check if average level is below threshold and enough time has passed
-                if avg_level < self.silence_threshold and time_since_last_audio.total_seconds() >= 2:
-                    logger.debug(f"Silence detected for client {self.socket_id} (avg level: {avg_level})")
-                    socketio.emit('stop_recording', {'reason': 'silence_detected'}, room=self.socket_id)
-                    self.close()
-                else:
-                    # If not silent, start a new timer
-                    self.reset_silence_timer()
-            else:
-                # Not enough audio samples yet, reset timer
-                self.reset_silence_timer()
         
     def add_chunk(self, chunk):
-        # logger.info(f"Received audio chunk from client {self.socket_id}")
         logger.isEnabledFor(logging.DEBUG)
         """Add an audio chunk to the buffer and update audio levels"""
         if not self.closed:
             try:
-
                 self.buffer.put(chunk, timeout=5)
-                self.reset_silence_timer()
                 
             except queue.Full:
                 logger.warning(f"Buffer full for client {self.socket_id}")
@@ -140,10 +92,7 @@ class AudioStreamHandler:
         if not self.closed:
             self.closed = True
             self.is_recording = False
-            if self.silence_timer:
-                self.silence_timer.cancel()
             self.buffer.put(None)
-            # logger.info(f"Closed stream for client {self.socket_id}")
 
     def generator(self):
         """Generate audio chunks from the buffer."""
@@ -154,14 +103,11 @@ class AudioStreamHandler:
                     return
                 yield chunk
             except queue.Empty:
-                # logger.warning(f"No audio received for 30 seconds from {self.socket_id}")
-                # self.emit_error("No audio received for 30 seconds - closing connection")
                 self.close()
                 return
 
     def emit_transcription(self, transcript):
         logger.isEnabledFor(logging.DEBUG)
-        # logger.debug(f"Transcription: {transcript}")
         """Emit transcription using Socket.IO."""
         try:
             socketio.emit('transcription', {'transcript': transcript}, room=self.socket_id)
@@ -218,9 +164,6 @@ def start_audio_stream():
         stream_handler = AudioStreamHandler(request.sid)
         active_streams[request.sid] = stream_handler
 
-        # Start silence detection
-        stream_handler.start_silence_detection()
-
         # Configure speech recognition
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
@@ -246,20 +189,13 @@ def start_audio_stream():
                     requests
                 )
 
-                empty_results_count = 0
-                # current_transcript = ""
-
                 for response in responses:
                     if handler.closed:
                         logger.info(f"Stream closed for client {handler.socket_id}")
                         break
 
-                    if handler.timeout_thread is not None:
-                        handler.timeout_thread.cancel()
                     handler.start_timeout()
 
-                    # logger.debug(f"Response received: {response}")  # Log full response
-                    # logger.debug(f"Number of results: {len(response.results)}")
                     if not response.results:
                         logger.isEnabledFor(logging.DEBUG)
                         continue
@@ -281,11 +217,12 @@ def start_audio_stream():
 
 
         # Start processing in a separate thread
-        threading.Thread(
-            target=process_audio_stream,
-            args=(stream_handler,),
-            daemon=True
-        ).start()
+        # threading.Thread(
+        #     target=process_audio_stream,
+        #     args=(stream_handler,),
+        #     daemon=True
+        # ).start()
+        process_audio_stream(stream_handler)
         
         socketio.emit('stream_started', {'status': 'success'}, room=request.sid)
         
@@ -328,13 +265,13 @@ def speak_text():
     audio_base64 = base64.b64encode(audio_content).decode('utf-8')
     return jsonify({"audio": audio_base64})
 
-request_lock = threading.Lock()
+# request_lock = threading.Lock()
 
-@timeout(30, use_signals=False)
+# @timeout(30, use_signals=False)
 @app.route('/answer_question', methods=['POST'])
 def answer_question():
-    if not request_lock.acquire(blocking=False):
-        return jsonify({'error': 'Request in progress'}), 429
+    # if not request_lock.acquire(blocking=False):
+    #     return jsonify({'error': 'Request in progress'}), 429
     try:
         data = request.get_json()
         user_message = data['question']
@@ -378,7 +315,8 @@ def answer_question():
 
         return jsonify(response_data)
     finally:
-        request_lock.release()
+        logger.info(f"Answer Question API called with question: {user_message}")
+    #     request_lock.release()
 
 @app.route('/word_helper', methods=['POST'])
 def word_helper_api():
