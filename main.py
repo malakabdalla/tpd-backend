@@ -16,7 +16,7 @@ from functools import partial
 from timeout_decorator import timeout
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.CRITICAL)
 
 logger = logging.getLogger(__name__)
 
