@@ -17,7 +17,7 @@ import json
 import re
 from speech import synthesize_speech_with_specific_voice
 # import base64
-from ai_functions import ai_answer_question
+from ai_functions import ai_answer_question, word_helper
 from functools import partial
 from timeout_decorator import timeout
 
@@ -333,7 +333,27 @@ def answer_question():
     finally:
         request_lock.release()
 
-
+@app.route('/word_helper', methods=['POST'])
+def word_helper_api():
+    data = request.get_json()
+    word = data['word']
+    logger.info(f"Word Helper API called with word: {word}")
+    response = word_helper(word)
+    logger.info(f"Word Helper API response: {response}")
+    text_content = response.content[0].text
+    description_match = re.search(r'<description>(.*?)</description>', text_content, re.DOTALL)
+    example_sentence_match = re.search(r'<example_sentence>(.*?)</example_sentence>', text_content, re.DOTALL)
+    similar_sounds_match = re.search(r'<similar_sounds>(.*?)</similar_sounds>', text_content, re.DOTALL)
+    description_text = description_match.group(1).strip()
+    example_text = example_sentence_match.group(1).strip()
+    similar_text = similar_sounds_match.group(1).strip()
+    response_data = {
+        "description": description_text,
+        "example_sentence": example_text,
+        "similar_sounds": similar_text
+    }
+    
+    return jsonify(response_data)
 # def run_http_server():
 #     # Run the Flask app for HTTP on port 5000
 #     app.run(host='0.0.0.0', port=8001)
