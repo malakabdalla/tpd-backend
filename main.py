@@ -341,7 +341,7 @@ def word_helper_api():
 #     socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port=443, ssl_context=("cert.pem", "key.pem")) # , allow_unsafe_werkzeug=True)
     # Start HTTP server in a separate thread
     # http_thread = threading.Thread(target=run_http_server)
     # http_thread.start()
