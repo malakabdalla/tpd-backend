@@ -158,10 +158,16 @@ def start_audio_stream():
         active_streams[request.sid] = stream_handler
 
         # Configure speech recognition
+        # config = speech.RecognitionConfig(
+        #     encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
+        #     sample_rate_hertz=16000,
+        #     language_code="en-US",
+        #     enable_automatic_punctuation=True,
+        # )
         config = speech.RecognitionConfig(
-            encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
+            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
-            language_code="en-US",
+            language_code="en-GB",
             enable_automatic_punctuation=True,
         )
 
