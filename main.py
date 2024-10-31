@@ -16,7 +16,7 @@ from functools import partial
 from timeout_decorator import timeout
 
 
-logging.basicConfig(level=logging.CRITICAL)
+logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 
@@ -127,7 +127,7 @@ active_streams = {}
 @socketio.on("connect")
 def handle_connect():
     """Handle new client connections."""
-    logger.info(f"Client connected: {request.sid}")
+    logger.debug(f"Client connected: {request.sid}")
     socketio.emit('connection_status', {'status': 'connected'}, room=request.sid)
 
 @socketio.on("disconnect")
@@ -319,12 +319,21 @@ def answer_question():
 
 @app.route('/word_helper', methods=['POST'])
 def word_helper_api():
+    logger.isEnabledFor(logging.DEBUG)
+    logger.debug("Word Helper API called")
     data = request.get_json()
-    word = data['word']
-    logger.info(f"Word Helper API called with word: {word}")
+    print(data)
+    logger.debug(f"Data: {data}")
+    word = data.get('word')
+    if not word:
+        return jsonify({'data': data}), 400
+    logger.debug(f"Word Helper API called with word: {word}")
     response = word_helper(word)
-    logger.info(f"Word Helper API response: {response}")
-    text_content = response.content[0].text
+    logger.debug(f"Word Helper API response: {response}")
+    if type(response) == str:
+        text_content = response
+    else:
+        text_content = response.content[0].text or response
     description_match = re.search(r'<description>(.*?)</description>', text_content, re.DOTALL)
     example_sentence_match = re.search(r'<example_sentence>(.*?)</example_sentence>', text_content, re.DOTALL)
     similar_sounds_match = re.search(r'<similar_sounds>(.*?)</similar_sounds>', text_content, re.DOTALL)
@@ -338,6 +347,9 @@ def word_helper_api():
     }
     
     return jsonify(response_data)
+    # result = {'message': 'success'}
+    # Ensure the function returns a valid response
+    # return jsonify(result)
 # def run_http_server():
 #     # Run the Flask app for HTTP on port 5000
 #     app.run(host='0.0.0.0', port=8001)
