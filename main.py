@@ -157,21 +157,19 @@ def start_audio_stream():
         stream_handler = AudioStreamHandler(request.sid)
         active_streams[request.sid] = stream_handler
 
-        # MODIFICATION: Expanded MIME type support
-        # config = speech.RecognitionConfig(
-        #     encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,  # Keep as primary
-        #     sample_rate_hertz=16000,
-        #     language_code="en-US",
-        #     enable_automatic_punctuation=True,
-        # )
-
-        # Alternative encoding (commented out, but available)
+        # Configure speech recognition
         config = speech.RecognitionConfig(
-            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+            encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
             sample_rate_hertz=16000,
             language_code="en-US",
             enable_automatic_punctuation=True,
         )
+        # config = speech.RecognitionConfig(
+        #     encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+        #     sample_rate_hertz=16000,
+        #     language_code="en-GB",
+        #     enable_automatic_punctuation=True,
+        # )
 
         streaming_config = speech.StreamingRecognitionConfig(
             config=config,
@@ -198,6 +196,7 @@ def start_audio_stream():
                     handler.start_timeout()
 
                     if not response.results:
+                        logger.isEnabledFor(logging.DEBUG)
                         continue
 
                     result = response.results[0]
@@ -206,9 +205,8 @@ def start_audio_stream():
 
                     transcript = result.alternatives[0].transcript
 
-                    # MODIFICATION: More robust transcription handling
-                    if result.is_final or (result.stability and result.stability > 0.8):
-                        logger.debug(f"Final Transcript: {transcript}")
+                    if result.is_final or result.stability > 0.8:
+                        logger.debug(f"result is_final Transcript: {transcript}")
                         handler.emit_transcription(transcript)
 
             except Exception as e:
@@ -216,7 +214,13 @@ def start_audio_stream():
                 handler.emit_error(f"Transcription error: {str(e)}")
                 handler.close()
 
-        # Run synchronously - uncomment thread version if needed
+
+        # Start processing in a separate thread
+        # threading.Thread(
+        #     target=process_audio_stream,
+        #     args=(stream_handler,),
+        #     daemon=True
+        # ).start()
         process_audio_stream(stream_handler)
         
         socketio.emit('stream_started', {'status': 'success'}, room=request.sid)
@@ -231,30 +235,26 @@ def handle_audio_chunk(data):
     try:
         if request.sid in active_streams:
             stream = active_streams[request.sid]
-            
-            # MODIFICATION: More robust base64 decoding
-            try:
-                audio_data = base64.b64decode(data['audio'])
-            except (KeyError, TypeError) as decode_error:
-                logger.error(f"Base64 decoding error: {str(decode_error)}")
-                return
-
+            audio_data = base64.b64decode(data['audio'])
             stream.add_chunk(audio_data)
     except Exception as e:
         logger.error(f"Error in handle_audio_chunk: {str(e)}")
         socketio.emit("error", {"message": str(e)}, room=request.sid)
 
-@socketio.on("end_audio_stream")
-def end_audio_stream():
-    """Handle ending of audio stream."""
+@socketio.on("stop_audio_stream")
+def stop_audio_stream():
+    """Stop the audio stream and clean up resources."""
+    logger.isEnabledFor(logging.DEBUG)
     try:
         if request.sid in active_streams:
+            logger.debug(f"Stopping audio stream for client {request.sid}")
             stream = active_streams[request.sid]
             stream.close()
             del active_streams[request.sid]
-            logger.info(f"Audio stream ended for client {request.sid}")
+            socketio.emit('stream_stopped', {'status': 'success'}, room=request.sid)
     except Exception as e:
-        logger.error(f"Error in end_audio_stream: {str(e)}")
+        logger.error(f"Error in stop_audio_stream: {str(e)}")
+        socketio.emit("error", {"message": str(e)}, room=request.sid)
 
 @app.route('/speak_text', methods=['POST'])
 def speak_text():
