@@ -1,0 +1,57 @@
+import os
+
+from google.cloud.speech_v2 import SpeechClient
+from google.cloud.speech_v2.types import cloud_speech
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+logger = logging.getLogger(__name__)
+
+# PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
+PROJECT_ID = "speedy-hold-440017-u3"
+
+
+def get_word(audio_content: bytes, phrase: str) -> cloud_speech.RecognizeResponse:
+    """Enhances speech recognition accuracy using an inline phrase set.
+    Args:
+        audio_content (bytes): The audio content in bytes
+        phrase (str): The phrase to boost recognition for
+    Returns:
+        cloud_speech.RecognizeResponse: The full response object which includes the transcription results.
+    """
+    # Instantiates a client
+    client = SpeechClient()
+
+    # Build inline phrase set to produce a more accurate transcript
+    phrase_set = cloud_speech.PhraseSet(
+        phrases=[{"value": phrase, "boost": 10}, {"value": "word", "boost": 20}]
+    )
+    adaptation = cloud_speech.SpeechAdaptation(
+        phrase_sets=[
+            cloud_speech.SpeechAdaptation.AdaptationPhraseSet(
+                inline_phrase_set=phrase_set
+            )
+        ]
+    )
+    config = cloud_speech.RecognitionConfig(
+        auto_decoding_config=cloud_speech.AutoDetectDecodingConfig(),
+        adaptation=adaptation,
+        language_codes=["en-GB"],
+        model="short",
+    )
+
+    # Prepare the request
+    request = cloud_speech.RecognizeRequest(
+        recognizer=f"projects/{PROJECT_ID}/locations/global/recognizers/_",
+        config=config,
+        content=audio_content,
+    )
+
+    # Transcribes the audio into text
+    response = client.recognize(request=request)
+
+    for result in response.results:
+        logger.debug(f"Transcript: {result.alternatives[0].transcript}")
+        print(f"Transcript: {result.alternatives[0].transcript}")
+
+    return response

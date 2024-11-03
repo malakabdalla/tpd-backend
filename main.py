@@ -1,5 +1,6 @@
 from flask_socketio import SocketIO, emit
-from google.cloud import speech
+from google.cloud.speech_v2 import SpeechClient
+from google.cloud.speech_v2.types import cloud_speech
 import queue
 import threading
 import base64
@@ -14,6 +15,7 @@ from speech import synthesize_speech_with_specific_voice
 from ai_functions import ai_answer_question, word_helper
 from functools import partial
 from timeout_decorator import timeout
+from word import get_word
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -22,12 +24,26 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
+@app.route('/get_word', methods=['POST'])
+def get_word_endpoint():
+    audio_file = request.files['audio']
+    phrase = request.form['phrase']
+    logger.debug(f"get_word request: {phrase}")
+    # Read the content directly from the FileStorage object
+    audio_content = audio_file.read()
+    response = get_word(audio_content, phrase)
+    logger.debug(f"get_word response: {response}")
+    logger.debug(f"get_word results: {response.results[0].alternatives[0].transcript}")
+    result = response.results[0].alternatives[0].transcript
+    return jsonify(result)
+
 socketio = SocketIO(
     app,
     cors_allowed_origins="*",
     async_mode='threading',
-    logger=False,
-    engineio_logger=False,
+    logger=True,
+    engineio_logger=True,
     ping_timeout=60,
     ping_interval=25,
     max_http_buffer_size=1e8,
@@ -44,12 +60,12 @@ class AudioStreamHandler:
         self.buffer = queue.Queue()
         self.closed = False
         self.is_recording = False
-        self.audio_levels = []  
+        self.audio_levels = []
         self.min_audio_chunks = 3  # Minimum number of chunks to calculate average
         self.timeout_duration = 1
         self.timeout_thread = None
         try:
-            self.client = speech.SpeechClient()
+            self.client = SpeechClient()
         except Exception as e:
             logger.error(f"Failed to initialize Speech client: {e}")
             raise
@@ -157,12 +173,25 @@ def start_audio_stream():
         stream_handler = AudioStreamHandler(request.sid)
         active_streams[request.sid] = stream_handler
 
+        phrase_set = cloud_speech.PhraseSet(
+            phrases=[{"value": "by", "boost": 200}, {"value": "ran", "boost": 200}]
+        )
+        adaptation = cloud_speech.SpeechAdaptation(
+            phrase_sets=[
+                cloud_speech.SpeechAdaptation.AdaptationPhraseSet(
+                    inline_phrase_set=phrase_set
+                )
+            ]
+        )
         # Configure speech recognition
-        config = speech.RecognitionConfig(
-            encoding=speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
+        config = cloud_speech.RecognitionConfig(
+            # auto_decoding_config=cloud_speech.AutoDetectDecodingConfig(),
+            adaptation=adaptation,
+            encoding=cloud_speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
             sample_rate_hertz=16000,
-            language_code="en-US",
+            language_code="en-GB",
             enable_automatic_punctuation=True,
+            model="short",
         )
         # config = speech.RecognitionConfig(
         #     encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
@@ -171,7 +200,7 @@ def start_audio_stream():
         #     enable_automatic_punctuation=True,
         # )
 
-        streaming_config = speech.StreamingRecognitionConfig(
+        streaming_config = cloud_speech.StreamingRecognitionConfig(
             config=config,
             interim_results=True
         )
@@ -180,7 +209,7 @@ def start_audio_stream():
             """Process audio stream and emit transcriptions."""
             try:
                 audio_generator = handler.generator()
-                requests = (speech.StreamingRecognizeRequest(audio_content=chunk)
+                requests = (cloud_speech.StreamingRecognizeRequest(audio_content=chunk)
                           for chunk in audio_generator)
                 
                 responses = handler.client.streaming_recognize(
@@ -228,6 +257,8 @@ def start_audio_stream():
     except Exception as e:
         logger.error(f"Error in start_audio_stream: {str(e)}")
         socketio.emit("error", {"message": str(e)}, room=request.sid)
+
+
 
 @socketio.on("audio_chunk")
 def handle_audio_chunk(data):
