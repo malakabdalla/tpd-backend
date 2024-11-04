@@ -17,6 +17,7 @@ from functools import partial
 from timeout_decorator import timeout
 from word import get_word
 
+from words_with_scores import transcribe_word_scores
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -24,6 +25,22 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
+@app.route('/get_word_scores', methods=['POST'])
+def get_word_scores():
+    audio_file = request.files['audio']
+    audio_content = audio_file.read()
+    result = transcribe_word_scores(audio_content)
+    ret_val = []
+    for result in result.results:
+        for word_info in result.alternatives[0].words:
+            ret_val.append({
+                "word": word_info.word,
+                "confidence": word_info.confidence
+            })
+    logger.debug(f"get_word_scores response: {result}")
+    logger.debug(f"return value: {ret_val}")
+    return ret_val
 
 @app.route('/get_word', methods=['POST'])
 def get_word_endpoint():
