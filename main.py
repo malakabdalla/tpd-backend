@@ -16,6 +16,7 @@ from ai_functions import ai_answer_question, word_helper
 from functools import partial
 from timeout_decorator import timeout
 from word import get_word
+from sentence import get_sentence
 
 from words_with_scores import transcribe_word_scores
 
@@ -25,6 +26,24 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
+@app.route('/get_sentence', methods=['POST'])
+def get_sentence_endpoint():
+    audio_file = request.files['audio']
+    phrase = request.form['phrase']
+    logger.debug(f"get_word request: {phrase}")
+    # Read the content directly from the FileStorage object
+    audio_content = audio_file.read()
+    response = get_sentence(audio_content, phrase)
+    logger.debug(f"get_word response: {response}")
+    ret_val = []
+    for result in response.results:
+        for word_info in result.alternatives[0].words:
+            ret_val.append({
+                "word": word_info.word,
+                "confidence": word_info.confidence
+            })
+    return ret_val
 
 @app.route('/get_word_scores', methods=['POST'])
 def get_word_scores():

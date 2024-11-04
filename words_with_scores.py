@@ -3,8 +3,7 @@ import os
 from google.cloud.speech_v2 import SpeechClient
 from google.cloud.speech_v2.types import cloud_speech
 
-PROJECT_ID = "speedy-hold-440017-u3"
-
+PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
 
 def transcribe_word_scores(
     audio_content: bytes

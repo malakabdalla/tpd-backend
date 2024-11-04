@@ -9,7 +9,9 @@ logger = logging.getLogger(__name__)
 
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
 
-def get_word(audio_content: bytes, phrase: str) -> cloud_speech.RecognizeResponse:
+
+
+def get_sentence(audio_content: bytes, phrase: str) -> cloud_speech.RecognizeResponse:
     """Enhances speech recognition accuracy using an inline phrase set.
     Args:
         audio_content (bytes): The audio content in bytes
@@ -22,7 +24,7 @@ def get_word(audio_content: bytes, phrase: str) -> cloud_speech.RecognizeRespons
 
     # Build inline phrase set to produce a more accurate transcript
     phrase_set = cloud_speech.PhraseSet(
-        phrases=[{"value": phrase, "boost": 10}, {"value": "word", "boost": 20}]
+        phrases=[{"value": phrase, "boost": 20}, {"value": "word", "boost": 20}]
     )
     adaptation = cloud_speech.SpeechAdaptation(
         phrase_sets=[
@@ -35,7 +37,10 @@ def get_word(audio_content: bytes, phrase: str) -> cloud_speech.RecognizeRespons
         auto_decoding_config=cloud_speech.AutoDetectDecodingConfig(),
         adaptation=adaptation,
         language_codes=["en-GB"],
-        model="short",
+        model="long",
+        features=cloud_speech.RecognitionFeatures(
+            enable_word_confidence=True,
+        ),
     )
 
     # Prepare the request
