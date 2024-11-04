@@ -17,6 +17,7 @@ from functools import partial
 from timeout_decorator import timeout
 from word import get_word
 from sentence import get_sentence
+from flask_socketio import SocketIO
 
 from words_with_scores import transcribe_word_scores
 
@@ -26,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route('/get_sentence', methods=['POST'])
 def get_sentence_endpoint():
