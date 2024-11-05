@@ -3,6 +3,7 @@ import os
 from google.cloud.speech_v2 import SpeechClient
 from google.cloud.speech_v2.types import cloud_speech
 import logging
+import os
 logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
