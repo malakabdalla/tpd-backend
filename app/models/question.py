@@ -2,7 +2,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 from flask_sqlalchemy import SQLAlchemy
 import enum
 
-db = SQLAlchemy()
+# db = SQLAlchemy()
 
 # Define Python Enum matching your PostgreSQL ENUM
 class QuestionType(enum.Enum):
