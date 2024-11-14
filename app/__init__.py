@@ -4,15 +4,16 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 # from app.api.questions import api_blueprint  # Import the blueprint
 from app.socket_handler import init_socket_handlers  # Import socket handlers
-from app.models import db
+from .models import db
 from .api.questions import api_blueprint
 
-db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://tpd:tpd@samuelmoore.cc:5432/tpd'
     CORS(app)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://tpd:tpd@samuelmoore.cc:5432/tpd'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
     
     # Initialize extensions
     db.init_app(app)
