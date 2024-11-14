@@ -1,5 +1,6 @@
 from app.models import db
 # Example model for curriculum
+from datetime import datetime  # Import datetime
 
 class Curriculum(db.Model):
     __tablename__ = 'curriculum'
