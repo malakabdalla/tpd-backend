@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_socketio import SocketIO
 from app.socket_handler import init_socket_handlers  # Import the function to initialize socket events
+from app.api import api_blueprint
 
 def create_app():
     app = Flask(__name__)
