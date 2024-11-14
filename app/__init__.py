@@ -7,7 +7,7 @@ from flask_cors import CORS
 def create_app():
     app = Flask(__name__)
 
-	CORS(app)
+    CORS(app)
     
     # Initialize SocketIO with app and CORS allowed origins
     socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
