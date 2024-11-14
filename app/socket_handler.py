@@ -1,7 +1,7 @@
 import logging
 import base64
 import queue
-from flask_socketio import emit
+from flask_socketio import SocketIO, emit
 from google.cloud.speech_v2 import SpeechClient
 from google.cloud.speech_v2.types import cloud_speech
 
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 active_streams = {}
 
-def init_socket_handlers(socketio):
+def init_socket_handlers(socketio: SocketIO):
     @socketio.on("connect")
     def handle_connect():
         """Handle new client connections."""
