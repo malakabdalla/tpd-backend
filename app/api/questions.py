@@ -19,7 +19,10 @@ def get_questions():
         Exercise.module_id == module_id,
         Question.exercise_id == exercise_id
     ).all()
-    
+
+    if not questions:  # Check if no questions are found
+           return jsonify([])  # Return empty list
+
     questions_list = [
         {
             "question_id": q.question_id,
