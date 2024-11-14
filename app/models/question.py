@@ -6,9 +6,9 @@ from app.models import db
 
 # Define Python Enum matching your PostgreSQL ENUM
 class QuestionType(enum.Enum):
-    REPEAT_WORD = 'repeat_word'
-    REPEAT_SENTENCE = 'repeat_sentence'
-    REPEAT_PARAGRAPH = 'repeat_paragraph'
+    repeat_word = 'repeat_word'
+    repeat_sentence = 'repeat_sentence'
+    repeat_paragraph = 'repeat_paragraph'
 
 class Question(db.Model):
     __tablename__ = 'question'
