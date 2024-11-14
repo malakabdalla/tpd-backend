@@ -1,20 +1,25 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
-from app.socket_handler import init_socket_handlers  # Import the function to initialize socket events
-from app.api import api_blueprint
 from flask_cors import CORS
+from app.api.questions import api_blueprint  # Import the blueprint
+from app.socket_handler import init_socket_handlers  # Import socket handlers
+
+db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'your_database_uri_here'  # Set your DB URI
     CORS(app)
     
-    # Initialize SocketIO with app and CORS allowed origins
+    # Initialize extensions
+    db.init_app(app)
     socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
-
-    app.register_blueprint(api_blueprint)
     
-    # Initialize the socket handlers (pass the socketio instance to it)
+    # Register blueprints
+    app.register_blueprint(api_blueprint)
+
+    # Initialize socket handlers
     init_socket_handlers(socketio)
 
     return app, socketio
