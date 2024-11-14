@@ -11,7 +11,7 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'your_database_uri_here'  # Set your DB URI
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://tpd:tpd@samuelmoore.cc:5432/tpd'
     CORS(app)
     
     # Initialize extensions
