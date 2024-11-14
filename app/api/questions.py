@@ -14,11 +14,11 @@ def get_questions():
     if not module_id or not exercise_id:
         return jsonify({"error": "module_id and exercise_id are required"}), 400
     
-    # Query the Question, Exercise, and Curriculum tables
-    questions = db.session.query(Question, Exercise, Curriculum).join(
+    # Query the Question, Exercise, and curriculum tables
+    questions = db.session.query(Question, Exercise, curriculum).join(
         Exercise, Exercise.exercise_id == Question.exercise_id
     ).join(
-        Curriculum, Curriculum.module_id == Exercise.module_id
+        curriculum, curriculum.module_id == Exercise.module_id
     ).filter(
         Exercise.module_id == module_id,
         Question.exercise_id == exercise_id
@@ -36,9 +36,9 @@ def get_questions():
             "data": q[0].data,
             "answers": q[0].answers,
             "description": q[1].description,  # Get description from Exercise table
-            "phonics": q[2].phonics,  # Get phonics from Curriculum table
-            "sight_words": q[2].sight_words,  # Get sight_words from Curriculum table
-            "other_topics": q[2].other_topics  # Get other_topics from Curriculum table
+            "phonics": q[2].phonics,  # Get phonics from curriculum table
+            "sight_words": q[2].sight_words,  # Get sight_words from curriculum table
+            "other_topics": q[2].other_topics  # Get other_topics from curriculum table
         } for q in questions
     ]
 
