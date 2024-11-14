@@ -4,6 +4,7 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 # from app.api.questions import api_blueprint  # Import the blueprint
 from app.socket_handler import init_socket_handlers  # Import socket handlers
+from app.models import db
 from .api.questions import api_blueprint
 
 db = SQLAlchemy()
