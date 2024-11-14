@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from app.models.question import Question
+from app.models.curriculum import Curriculum
 from app.models.exercise import Exercise  # Assuming you have an Exercise model defined
 from app.models.module import Module  # Assuming you have a Module model defined
 from app.models import db  # Ensure db is imported
