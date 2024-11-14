@@ -1,5 +1,3 @@
-from flask_socketio import SocketIO
-from flask import Flask
 from app import create_app
 import logging
 
