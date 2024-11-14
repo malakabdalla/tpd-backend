@@ -1,6 +1,4 @@
-# from flask_sqlalchemy import SQLAlchemy
-
-# db = SQLAlchemy()
+from app.models import db 
 
 class Exercise(db.Model):
     __tablename__ = 'exercise'
