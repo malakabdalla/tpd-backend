@@ -8,6 +8,8 @@ def create_app():
     # Initialize SocketIO with app and CORS allowed origins
     socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
+    app.register_blueprint(api_blueprint)
+    
     # Initialize the socket handlers (pass the socketio instance to it)
     init_socket_handlers(socketio)
 
