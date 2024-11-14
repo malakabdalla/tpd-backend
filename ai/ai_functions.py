@@ -6,7 +6,7 @@ import numpy as np
 
 from dotenv import load_dotenv
 # from sqlite_calls import SQLiteCalls
-from anthropic_calls import AnthropicCalls
+from ai.anthropic_calls import AnthropicCalls
 from anthropic import Anthropic
 from sklearn.metrics.pairwise import cosine_similarity
 from flask import jsonify
