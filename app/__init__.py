@@ -11,7 +11,7 @@ from .api.questions import api_blueprint
 def create_app():
     app = Flask(__name__)
     CORS(app)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://tpd:tpd@samuelmoore.cc:5432/tpd'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://tpd:tpd@localhost:5432/tpd'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     
