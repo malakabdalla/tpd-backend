@@ -7,6 +7,7 @@ from app.socket_handler import init_socket_handlers  # Import socket handlers
 from db.models import db
 from db.questions import api_blueprint
 from db.add_question import api_blueprint as add_question_blueprint
+from db.replace_question import api_blueprint as replace_question_blueprint
 
 
 def create_app():
@@ -23,6 +24,7 @@ def create_app():
     # Register blueprints
     app.register_blueprint(api_blueprint)
     app.register_blueprint(add_question_blueprint)
+    app.register_blueprint(replace_question_blueprint)
 
     # Initialize socket handlers
     init_socket_handlers(socketio)
