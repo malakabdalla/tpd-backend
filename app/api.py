@@ -5,10 +5,10 @@ from speech.word import get_word
 from speech.sentence import get_sentence
 from speech.words_with_scores import transcribe_word_scores
 import logging
+import re, base64
 
 logger = logging.getLogger(__name__)
 
-# Create a Blueprint for API endpoints
 api_blueprint_speech = Blueprint('api', __name__)
 
 @api_blueprint_speech.route('/get_sentence', methods=['POST'])
@@ -58,19 +58,13 @@ def get_word_endpoint():
 
 @api_blueprint_speech.route('/answer_question', methods=['POST'])
 def answer_question():
-    # if not request_lock.acquire(blocking=False):
-    #     return jsonify({'error': 'Request in progress'}), 429
     try:
         data = request.get_json()
         user_message = data['question']
         chat = data['chat']
         response = ai_answer_question(user_message, chat)
-        # print('\n\n:: ', response, '\n\n')
-
-        # Extract the text content from the response
         text_content = response.content[0].text
 
-        # Use regular expressions to extract response and continue values
         response_match = re.search(r'<response>(.*?)</response>', text_content, re.DOTALL)
         continue_match = re.search(r'<continue>(.*?)</continue>', text_content, re.DOTALL)
 
@@ -78,12 +72,6 @@ def answer_question():
             response_text = response_match.group(1).strip()
             continue_value = continue_match.group(1).strip().lower() == 'true'
 
-            ret_val = {'message': response_text, 'continue': continue_value}
-            # print(ret_val['continue'])
-            # print(ret_val)
-        #     return ret_val
-        # else:
-        #     return {'error': 'Failed to parse response'}
         response_text = response_match.group(1).strip()
         continue_value = continue_match.group(1).strip().lower() == 'true'
 
@@ -104,7 +92,6 @@ def answer_question():
         return jsonify(response_data)
     finally:
         logger.info(f"Answer Question API called with question: {user_message}")
-    #     request_lock.release()
 
 @api_blueprint_speech.route('/word_helper', methods=['POST'])
 def word_helper_api():
@@ -134,18 +121,7 @@ def word_helper_api():
         "example_sentence": example_text,
         "similar_sounds": similar_text
     }
-    
     return jsonify(response_data)
-    # result = {'message': 'success'}
-    # Ensure the function returns a valid response
-    # return jsonify(result)
-# def run_http_server():
-#     # Run the Flask app for HTTP on port 5000
-#     app.run(host='0.0.0.0', port=8001)
-
-# def run_socket_server():
-#     # Run the Socket.IO server on port 5000
-#     socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
 
 @api_blueprint_speech.route('/speak_text', methods=['POST'])
 def speak_text():
