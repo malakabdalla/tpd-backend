@@ -3,7 +3,7 @@ from db.models import db, Question, Exercise, QuestionType, Module
 
 api_blueprint_replace = Blueprint('replace', __name__)
 
-@api_blueprint_replace.route('/replace_question', methods=['PUT'])
+@api_blueprint_replace.route('/replace_question', methods=['POST'])
 def replace_question():
     try:
         # Get data from the request
