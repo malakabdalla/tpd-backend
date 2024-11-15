@@ -8,6 +8,7 @@ from db.models import db
 from db.questions import api_blueprint_get
 from db.add_question import api_blueprint_add
 from db.replace_question import api_blueprint_replace
+from user import user_blueprint
 from app.api import api_blueprint_speech
 
 
@@ -27,6 +28,7 @@ def create_app():
     app.register_blueprint(api_blueprint_add)
     app.register_blueprint(api_blueprint_replace)
     app.register_blueprint(api_blueprint_speech)
+    app.register_blueprint(user_blueprint)
 
     # Initialize socket handlers
     init_socket_handlers(socketio)
