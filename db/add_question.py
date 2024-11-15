@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
 from db.models import db, Question, Exercise, QuestionType, Module
 
-api_blueprint = Blueprint('api', __name__)
+api_blueprint_add = Blueprint('add_question', __name__)
 
-@api_blueprint.route('/add_question', methods=['POST'])
+@api_blueprint_add.route('/add_question', methods=['POST'])
 def add_question():
     try:
         # Get data from the request

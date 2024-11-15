@@ -5,9 +5,9 @@ from flask_cors import CORS
 # from app.api.questions import api_blueprint  # Import the blueprint
 from app.socket_handler import init_socket_handlers  # Import socket handlers
 from db.models import db
-from db.questions import api_blueprint
-from db.add_question import api_blueprint as add_question_blueprint
-from db.replace_question import api_blueprint as replace_question_blueprint
+from db.questions import api_blueprint_get
+from db.add_question import api_blueprint_add
+from db.replace_question import api_blueprint_replace
 
 
 def create_app():
@@ -22,9 +22,9 @@ def create_app():
     socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
     
     # Register blueprints
-    app.register_blueprint(api_blueprint)
-    app.register_blueprint(add_question_blueprint)
-    app.register_blueprint(replace_question_blueprint)
+    app.register_blueprint(api_blueprint_get)
+    app.register_blueprint(api_blueprint_add)
+    app.register_blueprint(api_blueprint_replace)
 
     # Initialize socket handlers
     init_socket_handlers(socketio)
