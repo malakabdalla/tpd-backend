@@ -9,9 +9,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Create a Blueprint for API endpoints
-api_blueprint = Blueprint('api', __name__)
+api_blueprint_speech = Blueprint('api', __name__)
 
-@api_blueprint.route('/get_sentence', methods=['POST'])
+@api_blueprint_speech.route('/get_sentence', methods=['POST'])
 def get_sentence_endpoint():
     audio_file = request.files['audio']
     phrase = request.form['phrase']
@@ -28,7 +28,7 @@ def get_sentence_endpoint():
             })
     return ret_val
 
-@api_blueprint.route('/get_word_scores', methods=['POST'])
+@api_blueprint_speech.route('/get_word_scores', methods=['POST'])
 def get_word_scores():
     audio_file = request.files['audio']
     audio_content = audio_file.read()
@@ -44,7 +44,7 @@ def get_word_scores():
     logger.debug(f"return value: {ret_val}")
     return ret_val
 
-@api_blueprint.route('/get_word', methods=['POST'])
+@api_blueprint_speech.route('/get_word', methods=['POST'])
 def get_word_endpoint():
     audio_file = request.files['audio']
     phrase = request.form['phrase']
@@ -56,7 +56,7 @@ def get_word_endpoint():
     result = response.results[0].alternatives[0].transcript
     return jsonify(result)
 
-@api_blueprint.route('/answer_question', methods=['POST'])
+@api_blueprint_speech.route('/answer_question', methods=['POST'])
 def answer_question():
     # if not request_lock.acquire(blocking=False):
     #     return jsonify({'error': 'Request in progress'}), 429
@@ -106,7 +106,7 @@ def answer_question():
         logger.info(f"Answer Question API called with question: {user_message}")
     #     request_lock.release()
 
-@api_blueprint.route('/word_helper', methods=['POST'])
+@api_blueprint_speech.route('/word_helper', methods=['POST'])
 def word_helper_api():
     logger.isEnabledFor(logging.DEBUG)
     logger.debug("Word Helper API called")
@@ -147,7 +147,7 @@ def word_helper_api():
 #     # Run the Socket.IO server on port 5000
 #     socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
 
-@api_blueprint.route('/speak_text', methods=['POST'])
+@api_blueprint_speech.route('/speak_text', methods=['POST'])
 def speak_text():
     data = request.get_json()
     text = data['message']
