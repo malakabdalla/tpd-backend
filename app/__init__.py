@@ -4,8 +4,8 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 # from app.api.questions import api_blueprint  # Import the blueprint
 from app.socket_handler import init_socket_handlers  # Import socket handlers
-from .models import db
-from .api.questions import api_blueprint
+from db.models import db
+from db.questions import api_blueprint
 
 
 def create_app():
