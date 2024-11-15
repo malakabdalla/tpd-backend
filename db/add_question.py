@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from db.models import db, Question, Exercise, QuestionType, Module
 
-api_blueprint = Blueprint('questions', __name__)
+api_blueprint = Blueprint('api', __name__)
 
 @api_blueprint.route('/add_question', methods=['POST'])
 def add_question():
