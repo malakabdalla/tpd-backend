@@ -57,7 +57,7 @@ class Question(db.Model):
     updated_at = db.Column(db.TIMESTAMP, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
     # Relationship with Answer
-    answers_rel = db.relationship('Answer', backref='question', lazy=True)
+    answers_rel = db.relationship('Answer', backref='question_answers', lazy=True)
 
 # Answer Table
 class Answer(db.Model):
@@ -73,7 +73,7 @@ class Answer(db.Model):
     created_at = db.Column(db.TIMESTAMP, default=db.func.current_timestamp())
     updated_at = db.Column(db.TIMESTAMP, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
-    # Relationship with User
+    # Relationships
     user = db.relationship('User', back_populates='answers')
     question = db.relationship('Question', back_populates='answers_rel')
     exercise = db.relationship('Exercise', back_populates='answers')
@@ -108,4 +108,3 @@ class User(db.Model):
 
     # Relationship with Answers
     answers = db.relationship('Answer', back_populates='user')
-
