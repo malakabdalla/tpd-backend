@@ -1,26 +1,15 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 from db.models import Question, Exercise, Module, db
 
 api_blueprint_get = Blueprint('get_questions', __name__)
 
 @api_blueprint_get.route('/get_questions', methods=['GET'])
 def get_questions():
-    # Get parameters from query string
-    module_id = request.args.get('module_id')
-    exercise_id = request.args.get('exercise_id')
-    
-    # Validate that both module_id and exercise_id are provided
-    if not module_id or not exercise_id:
-        return jsonify({"error": "module_id and exercise_id are required"}), 400
-    
-    # Query the Question, Exercise, and Module tables
+    # Query all questions along with their corresponding exercise and module data
     questions = db.session.query(Question, Exercise, Module).join(
         Exercise, Exercise.exercise_id == Question.exercise_id
     ).join(
         Module, Module.module_id == Exercise.module_id
-    ).filter(
-        Exercise.module_id == module_id,
-        Question.exercise_id == exercise_id
     ).all()
 
     # If no questions are found, return an empty list
