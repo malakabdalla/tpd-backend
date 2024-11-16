@@ -57,7 +57,7 @@ class Question(db.Model):
     updated_at = db.Column(TIMESTAMP, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
     # Relationship
-    answers = db.relationship('Answer', backref='question', lazy=True)  # One question can have many answers
+    answers = db.relationship('Answer', backref='question_answers', lazy=True)  # One question can have many answers
 
 # Answer Table
 class Answer(db.Model):
