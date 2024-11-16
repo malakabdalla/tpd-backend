@@ -42,7 +42,7 @@ def get_questions():
         {
             "question_id": q[0].question_id,
             "question_number": q[0].question_number,
-            "question_type": q[0].question_type.value,  # Access enum value
+            "question_type": q[0].question_type, 
             "prompts": q[0].prompts,
             "data": q[0].data,
             "answers": q[0].answers,
