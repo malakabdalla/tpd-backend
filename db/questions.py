@@ -1,27 +1,48 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from db.models import Question, Exercise, Module, db
 
 api_blueprint_get = Blueprint('get_questions', __name__)
 
 @api_blueprint_get.route('/get_questions', methods=['GET'])
 def get_questions():
-    # Query all questions along with their corresponding exercise and module data
+    module_number = request.args.get('module_number')
+    exercise_number = request.args.get('exercise_number')
+    
+    if not module_number or not exercise_number:
+        return jsonify({"error": "module_number and exercise_number are required"}), 400
+
+    # Retrieve the module_id based on module_number
+    module = db.session.query(Module).filter(Module.module_number == module_number).first()
+    if not module:
+        return jsonify({"error": f"Module with number {module_number} not found"}), 404
+
+    # Retrieve the exercise_id based on exercise_number and module_id
+    exercise = db.session.query(Exercise).filter(
+        Exercise.exercise_number == exercise_number,
+        Exercise.module_id == module.module_id
+    ).first()
+    
+    if not exercise:
+        return jsonify({"error": f"Exercise with number {exercise_number} not found in module {module_number}"}), 404
+    
+    # Now query the Question, Exercise, and Module tables
     questions = db.session.query(Question, Exercise, Module).join(
         Exercise, Exercise.exercise_id == Question.exercise_id
     ).join(
         Module, Module.module_id == Exercise.module_id
+    ).filter(
+        Exercise.module_id == module.module_id,
+        Question.exercise_id == exercise.exercise_id
     ).all()
 
-    # If no questions are found, return an empty list
-    if not questions:
-        return jsonify([])
+    if not questions:  # Check if no questions are found
+        return jsonify([])  # Return empty list
 
-    # Prepare the list of questions with the required fields
     questions_list = [
         {
             "question_id": q[0].question_id,
             "question_number": q[0].question_number,
-            "question_type": q[0].question_type.value,  # Access the enum value for question_type
+            "question_type": q[0].question_type.value,  # Access enum value
             "prompts": q[0].prompts,
             "data": q[0].data,
             "answers": q[0].answers,
@@ -32,5 +53,4 @@ def get_questions():
         } for q in questions
     ]
 
-    # Return the formatted list of questions as JSON
     return jsonify(questions_list)
