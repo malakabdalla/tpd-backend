@@ -8,7 +8,6 @@ user_blueprint = Blueprint('user', __name__)
 # Route for adding a new user
 @user_blueprint.route('/add_user', methods=['POST'])
 def add_user_route():
-    print("hello world")
     data = request.get_json()  # Get data from the request
 
     # Call the add_user function with the data

@@ -28,7 +28,7 @@ def create_app():
     app.register_blueprint(api_blueprint_add)
     app.register_blueprint(api_blueprint_replace)
     app.register_blueprint(api_blueprint_speech)
-    app.register_blueprint(user_blueprint)
+    app.register_blueprint(user_blueprint, url_prefix='/user')
 
     # Initialize socket handlers
     init_socket_handlers(socketio)
