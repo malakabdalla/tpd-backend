@@ -2,6 +2,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 import enum
+import json
 
 db = SQLAlchemy()
 
@@ -39,7 +40,13 @@ class Module(db.Model):
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    # JSONB columns for phonics, sight_words, and other_topics
+    phonics = db.Column(db.JSONB, nullable=True, default=list)  # This is a simple array
+    sight_words = db.Column(db.JSONB, nullable=True, default=list)  # This is a simple array
+    other_topics = db.Column(db.JSONB, nullable=True, default=list)  # This is a simple array
+
     exercises = db.relationship('Exercise', back_populates='module')
+
 
 class Exercise(db.Model):
     __tablename__ = 'exercise'
