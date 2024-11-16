@@ -1,3 +1,4 @@
+from sqlalchemy.dialects.postgresql import JSONB
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
@@ -41,7 +42,7 @@ class Exercise(db.Model):
     module_id = db.Column(db.Integer, db.ForeignKey('module.module_id'), nullable=False)
     exercise_number = db.Column(db.Integer, nullable=False)
     exercise_name = db.Column(db.String, nullable=False)
-    description = db.Column(db.JSONB)
+    description = db.Column(JSONB)  # Use the correct JSONB type for PostgreSQL
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -56,9 +57,9 @@ class Question(db.Model):
     exercise_id = db.Column(db.Integer, db.ForeignKey('exercise.exercise_id'), nullable=False)
     question_number = db.Column(db.Integer, nullable=False)
     question_type = db.Column(db.Enum('repeat_word', 'repeat_sentence', 'repeat_paragraph', name='question_type'), nullable=False)
-    prompts = db.Column(db.JSONB)
-    data = db.Column(db.JSONB)
-    answers = db.Column(db.JSONB)  # You may want to adjust the data type for this column
+    prompts = db.Column(JSONB)  # Use the correct JSONB type for PostgreSQL
+    data = db.Column(JSONB)  # Use the correct JSONB type for PostgreSQL
+    answers = db.Column(JSONB)  # You may want to adjust the data type for this column
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
 
