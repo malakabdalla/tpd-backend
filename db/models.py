@@ -4,6 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+class QuestionType(enum.Enum):
+    repeat_word = 'repeat_word'
+    repeat_sentence = 'repeat_sentence'
+    repeat_paragraph = 'repeat_paragraph'
+    
 class User(db.Model):
     __tablename__ = 'users'
 
