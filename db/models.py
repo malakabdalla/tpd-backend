@@ -1,6 +1,7 @@
 from sqlalchemy.dialects.postgresql import JSONB
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+import enum
 
 db = SQLAlchemy()
 
@@ -8,7 +9,7 @@ class QuestionType(enum.Enum):
     repeat_word = 'repeat_word'
     repeat_sentence = 'repeat_sentence'
     repeat_paragraph = 'repeat_paragraph'
-    
+
 class User(db.Model):
     __tablename__ = 'users'
 
