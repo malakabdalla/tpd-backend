@@ -53,7 +53,6 @@ class Curriculum(db.Model):
 
 class User(db.Model):
     __tablename__ = 'users'
-
     user_id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
@@ -75,3 +74,22 @@ class User(db.Model):
 
     def check_password(self, password: str) -> bool:
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
+    
+class Answer(db.Model):
+    __tablename__ = 'answers'
+    
+    # Define columns
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.question_id'), nullable=False)
+    exercise_id = db.Column(db.Integer, db.ForeignKey('exercise.exercise_id'), nullable=False)
+    module_id = db.Column(db.Integer, db.ForeignKey('module.module_id'), nullable=False)
+    answer_text = db.Column(db.String, nullable=False)  # The user's answer text
+    audio_path = db.Column(db.String, nullable=True)  # Path to the audio file, can be NULL if not provided
+    created_at = db.Column(db.TIMESTAMP, default=db.func.current_timestamp())
+
+    # Define relationships
+    user = db.relationship('User', back_populates='answers')
+    question = db.relationship('Question', back_populates='answers')
+    exercise = db.relationship('Exercise', back_populates='answers')
+    module = db.relationship('Module', back_populates='answers')
