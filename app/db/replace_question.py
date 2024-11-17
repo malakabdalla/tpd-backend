@@ -1,10 +1,7 @@
-from flask import Blueprint, request, jsonify
-from db.models import db, Question, Exercise, QuestionType, Module
+from flask import request, jsonify
+from .models import db, Question, Exercise, QuestionType, Module
 
-api_blueprint_replace = Blueprint('replace', __name__)
-
-@api_blueprint_replace.route('/replace_question', methods=['POST'])
-def replace_question():
+def replace_question(data):
     try:
         # Get data from the request
         data = request.get_json()

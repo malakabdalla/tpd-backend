@@ -1,9 +1,6 @@
 from flask import Blueprint, jsonify, request
-from db.models import Question, Exercise, Module, db
+from .models import Question, Exercise, Module, db
 
-api_blueprint_get = Blueprint('get_questions', __name__)
-
-@api_blueprint_get.route('/get_questions', methods=['GET'])
 def get_questions():
     module_number = request.args.get('module_number')
     exercise_number = request.args.get('exercise_number')

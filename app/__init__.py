@@ -1,16 +1,12 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 from flask_cors import CORS
-# from app.api.questions import api_blueprint  # Import the blueprint
 from app.socket_handler import init_socket_handlers  # Import socket handlers
-from db.models import db
-from db.questions import api_blueprint_get
-from db.add_question import api_blueprint_add
-from db.replace_question import api_blueprint_replace
-from user import user_blueprint
-from app.api import api_blueprint_speech
-
+from .db.models import db
+from .db import db_blueprint
+from .user import user_blueprint
+from .ai import ai_blueprint
+from .speech import speech_blueprint
 
 def create_app():
     app = Flask(__name__)
@@ -24,11 +20,10 @@ def create_app():
     socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
     
     # Register blueprints
-    app.register_blueprint(api_blueprint_get)
-    app.register_blueprint(api_blueprint_add)
-    app.register_blueprint(api_blueprint_replace)
-    app.register_blueprint(api_blueprint_speech)
-    app.register_blueprint(user_blueprint, url_prefix='/user')
+    app.register_blueprint(db_blueprint)
+    app.register_blueprint(speech_blueprint)
+    app.register_blueprint(user_blueprint)
+    app.register_blueprint(ai_blueprint)
 
     # Initialize socket handlers
     init_socket_handlers(socketio)

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from db.models import db
-from user.add_user import add_user  # Import the function for adding a user
+from app.db.models import db
+from app.user.add_user import add_user  # Import the function for adding a user
 
 # Create a Blueprint for user-related routes
 user_blueprint = Blueprint('user', __name__)

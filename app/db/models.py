@@ -2,8 +2,6 @@ from sqlalchemy.dialects.postgresql import JSONB
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 import enum
-import json
-from sqlalchemy.dialects.postgresql import JSONB  # Import JSONB type
 
 db = SQLAlchemy()
 
@@ -41,7 +39,6 @@ class Module(db.Model):
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Use the correct JSONB type from sqlalchemy.dialects.postgresql
     phonics = db.Column(JSONB, nullable=True, default=list)  # JSONB array
     sight_words = db.Column(JSONB, nullable=True, default=list)  # JSONB array
     other_topics = db.Column(JSONB, nullable=True, default=list)  # JSONB array
@@ -55,7 +52,7 @@ class Exercise(db.Model):
     module_id = db.Column(db.Integer, db.ForeignKey('module.module_id'), nullable=False)
     exercise_number = db.Column(db.Integer, nullable=False)
     exercise_name = db.Column(db.String, nullable=False)
-    description = db.Column(JSONB)  # Use the correct JSONB type for PostgreSQL
+    description = db.Column(JSONB) 
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -70,9 +67,9 @@ class Question(db.Model):
     exercise_id = db.Column(db.Integer, db.ForeignKey('exercise.exercise_id'), nullable=False)
     question_number = db.Column(db.Integer, nullable=False)
     question_type = db.Column(db.Enum('repeat_word', 'repeat_sentence', 'repeat_paragraph', name='question_type'), nullable=False)
-    prompts = db.Column(JSONB)  # Use the correct JSONB type for PostgreSQL
-    data = db.Column(JSONB)  # Use the correct JSONB type for PostgreSQL
-    answers = db.Column(JSONB)  # You may want to adjust the data type for this column
+    prompts = db.Column(JSONB) 
+    data = db.Column(JSONB) 
+    answers = db.Column(JSONB)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
 

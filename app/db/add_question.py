@@ -1,14 +1,8 @@
 from flask import Blueprint, request, jsonify
-from db.models import db, Question, Exercise, QuestionType, Module
+from .models import db, Question, Exercise, QuestionType, Module
 
-api_blueprint_add = Blueprint('add_question', __name__)
-
-@api_blueprint_add.route('/add_question', methods=['POST'])
-def add_question():
-    try:
-        # Get data from the request
-        data = request.get_json()
-        
+def add_question(data):
+    try:        
         # Ensure that the necessary fields are provided
         if not all(key in data for key in ('module_number', 'exercise_number', 'question_type', 'prompts', 'data', 'answers')):
             return jsonify({"error": "Missing required fields"}), 400
