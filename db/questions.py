@@ -38,19 +38,34 @@ def get_questions():
     if not questions:  # Check if no questions are found
         return jsonify([])  # Return empty list
 
+    # Extract data from q[1] and q[2] only once
+    exercise_info = {
+        "description": questions[0][1].description,  # Assuming questions is non-empty
+    }
+    module_info = {
+        "phonics": questions[0][2].phonics,
+        "sight_words": questions[0][2].sight_words,
+        "other_topics": questions[0][2].other_topics
+    }
+
+    # Create a list of questions with only data from q[0]
     questions_list = [
         {
             "question_id": q[0].question_id,
             "question_number": q[0].question_number,
-            "question_type": q[0].question_type, 
+            "question_type": q[0].question_type,
             "prompts": q[0].prompts,
             "data": q[0].data,
             "answers": q[0].answers,
-            "description": q[1].description,  # Get description from Exercise table
-            "phonics": q[2].phonics,  # Get phonics from Module table
-            "sight_words": q[2].sight_words,  # Get sight_words from Module table
-            "other_topics": q[2].other_topics  # Get other_topics from Module table
         } for q in questions
     ]
 
-    return jsonify(questions_list)
+    # Combine the extracted data with the list of questions
+    result = {
+        "exercise_info": exercise_info,
+        "module_info": module_info,
+        "questions": questions_list
+    }
+
+
+    return jsonify(result)
