@@ -16,7 +16,7 @@ def get_sentence(audio_content: bytes, phrase: str) -> cloud_speech.RecognizeRes
 
     # Build inline phrase set to produce a more accurate transcript
     phrase_set = cloud_speech.PhraseSet(
-        phrases=[{"value": phrase, "boost": 20}, {"value": "word", "boost": 20}]
+        phrases=[{"value": phrase, "boost": 20}]
     )
     adaptation = cloud_speech.SpeechAdaptation(
         phrase_sets=[
