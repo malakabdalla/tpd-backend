@@ -1,18 +1,8 @@
-import os
-
 from google.cloud.speech_v2 import SpeechClient
 from google.cloud.speech_v2.types import cloud_speech
-import logging
-import os
-logging.basicConfig(level=logging.DEBUG)
+from app.config import PROJECT_ID, logger
 
-logger = logging.getLogger(__name__)
-
-PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
-
-
-
-def get_sentence(audio_content: bytes, phrase: str) -> cloud_speech.RecognizeResponse:
+def get_word(audio_content: bytes, phrase: str) -> cloud_speech.RecognizeResponse:
     """Enhances speech recognition accuracy using an inline phrase set.
     Args:
         audio_content (bytes): The audio content in bytes
@@ -25,7 +15,7 @@ def get_sentence(audio_content: bytes, phrase: str) -> cloud_speech.RecognizeRes
 
     # Build inline phrase set to produce a more accurate transcript
     phrase_set = cloud_speech.PhraseSet(
-        phrases=[{"value": phrase, "boost": 20}, {"value": "word", "boost": 20}]
+        phrases=[{"value": phrase, "boost": 10}, {"value": "word", "boost": 20}]
     )
     adaptation = cloud_speech.SpeechAdaptation(
         phrase_sets=[
@@ -38,10 +28,7 @@ def get_sentence(audio_content: bytes, phrase: str) -> cloud_speech.RecognizeRes
         auto_decoding_config=cloud_speech.AutoDetectDecodingConfig(),
         adaptation=adaptation,
         language_codes=["en-GB"],
-        model="long",
-        features=cloud_speech.RecognitionFeatures(
-            enable_word_confidence=True,
-        ),
+        model="short",
     )
 
     # Prepare the request
