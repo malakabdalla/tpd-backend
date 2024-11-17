@@ -3,8 +3,13 @@ from .add_question import add_question
 from .questions import get_questions
 from .replace_question import replace_question
 from .exercise_by_id import get_questions_by_exercise_id
+from .homepage import get_homepage_data
 
 db_blueprint = Blueprint('db', __name__)
+
+@db_blueprint.route('/get_homepage_data', methods=['GET'])
+def get_homepage_data_route():
+    return get_homepage_data()
 
 @db_blueprint.route('/add_question', methods=['POST'])
 def add_question_route():
