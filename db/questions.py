@@ -40,8 +40,8 @@ def get_questions():
     result = {}
     # Extract data from q[1] and q[2] only once
     result["description"] = questions[0][1].description
-    result["phonics"] = questions[0][2].phonics,
-    result["sight_words"] = questions[0][2].sight_words,
+    result["phonics"] = questions[0][2].phonics
+    result["sight_words"] = questions[0][2].sight_words
     result["other_topics"] = questions[0][2].other_topics
 
     # Create a list of questions with only data from q[0]
