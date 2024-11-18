@@ -28,6 +28,6 @@ def replace_question_route():
 
 @db_blueprint.route('/get_exercise_by_id', methods=['GET'])
 def get_question_by_exercise_id_route():
-    exercise_id = request.form.get('exercise_id')
+    exercise_id = request.args.get('exercise_id')
     logger.debug(f"exercise_id: {exercise_id}")
     return get_questions_by_exercise_id(exercise_id)
