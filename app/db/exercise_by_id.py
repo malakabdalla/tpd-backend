@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import jsonify
 from .models import Question, Exercise, Module, db
 
 def get_questions_by_exercise_id(exercise_id):
