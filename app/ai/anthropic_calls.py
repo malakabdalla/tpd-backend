@@ -1,7 +1,5 @@
 import anthropic
-
 from chromadb.utils import embedding_functions
-
 
 class AnthropicCalls:
     def __init__(
