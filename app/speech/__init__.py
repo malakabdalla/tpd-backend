@@ -3,9 +3,19 @@ from flask import Blueprint, request, jsonify
 from .word import get_word
 from .sentence import get_sentence
 from .words_with_scores import transcribe_word_scores
+from .speech import synthesize_speech_with_specific_voice
 from app.config import logger
+import base64
 
 speech_blueprint = Blueprint('speech', __name__)
+
+@speech_blueprint.route('/speak_text', methods=['POST'])
+def speak_text():
+    data = request.get_json()
+    text = data['message']
+    audio_content = synthesize_speech_with_specific_voice(text)
+    audio_base64 = base64.b64encode(audio_content).decode('utf-8')
+    return jsonify({"audio": audio_base64})
 
 @speech_blueprint.route('/get_sentence', methods=['POST'])
 def get_sentence_endpoint():
