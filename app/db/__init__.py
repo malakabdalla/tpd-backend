@@ -26,7 +26,7 @@ def replace_question_route():
     data = request.get_json()
     return replace_question(data)
 
-@db_blueprint.route('/get_exercise_by_id', methods=['POST'])
+@db_blueprint.route('/get_exercise_by_id', methods=['GET'])
 def get_question_by_exercise_id_route():
     exercise_id = request.form.get('exercise_id')
     logger.debug(f"exercise_id: {exercise_id}")
