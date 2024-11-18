@@ -33,7 +33,10 @@ Your task is to generate a helpful response based on the exercise details and th
 4. Offer tips on how to approach the exercise if the user seems confused.
 5. Keep your response concise and easy to understand, considering the user's literacy level.
 6. Do not provide any information or assistance beyond what's relevant to the current exercise and the user's specific request.
-
+7. The sight words provided in the exercise details are examples of words that may be used in the exercise but are not exhaustive.
+8. The words in the 'data' field of the exercise_details are the words the user is asked to repeat.
+9. The user is presented with the words in 'data' and must select them one at a time and records themselves saying the word.
+10. Compose your response using words appropriate to the level of the questions
 Formulate your response as a string that can be printed and synthesized into audio feedback. The response should be clear, helpful, and directly address the user's request while taking into account the exercise details.
 
 Present your response within <answer> tags. Do not include any other text or explanations outside of these tags."""
@@ -49,8 +52,8 @@ Present your response within <answer> tags. Do not include any other text or exp
         should_print=False,
         clear_after_response=False
     )
-
-        return response
+        print (response)
+        return response.content[0].text.strip()
         
     except Exception as e:
         return f"Error: {str(e)}"
