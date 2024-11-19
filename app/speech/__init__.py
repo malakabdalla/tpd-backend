@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-# from .speech import synthesize_speech_with_specific_voice  # example import, replace as necessary
 from .word import get_word
 from .sentence import get_sentence
 from .words_with_scores import transcribe_word_scores

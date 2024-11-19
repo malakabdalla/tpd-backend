@@ -6,7 +6,7 @@ import enum
 db = SQLAlchemy()
 
 class QuestionType(enum.Enum):
-    repeat_word = 'repeat_word'
+    repeat_words = 'repeat_words'
     repeat_sentence = 'repeat_sentence'
     repeat_paragraph = 'repeat_paragraph'
 
@@ -66,7 +66,7 @@ class Question(db.Model):
     question_id = db.Column(db.Integer, primary_key=True)
     exercise_id = db.Column(db.Integer, db.ForeignKey('exercise.exercise_id'), nullable=False)
     question_number = db.Column(db.Integer, nullable=False)
-    question_type = db.Column(db.Enum('repeat_word', 'repeat_sentence', 'repeat_paragraph', name='question_type'), nullable=False)
+    question_type = db.Column(db.Enum('repeat_words', 'repeat_sentence', 'repeat_paragraph', name='question_type'), nullable=False)
     prompts = db.Column(JSONB) 
     data = db.Column(JSONB) 
     answers = db.Column(JSONB)
