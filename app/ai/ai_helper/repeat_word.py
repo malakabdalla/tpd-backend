@@ -1,11 +1,15 @@
-from app.ai.anthropic_calls import AnthropicCalls
-from app.config import ANTHROPIC_API_KEY
+from dotenv import load_dotenv
+from anthropic import Anthropic
 
-def repeat_word(data):
+load_dotenv()
+
+#automatically looks for an "ANTHROPIC_API_KEY" environment variable
+client = Anthropic()
+
+def repeat_words(data):
     try:
         EXERCISE_DETAILS = data['exercise_details']
         USER_REQUEST = data['user_request']
-        # Initialize the client - you'll need to set ANTHROPIC_API_KEY in your environment
         message = f"""
 You are an AI assistant for a charity program that teaches literacy to ex-convicts. Your role is to provide helpful feedback and assistance when users request help during their exercises. The current exercise involves the user repeating a word vocally, which is then converted to text using speech recognition.
 
@@ -39,21 +43,18 @@ Your task is to generate a helpful response based on the exercise details and th
 10. Compose your response using words appropriate to the level of the questions
 Formulate your response as a string that can be printed and synthesized into audio feedback. The response should be clear, helpful, and directly address the user's request while taking into account the exercise details.
 
-Present your response within <answer> tags. Do not include any other text or explanations outside of these tags."""
+Present your response within <answer> tags. Do not include any other text or explanations outside of these tags.
+"""
 
-        ai_help = AnthropicCalls(
-            api_key=ANTHROPIC_API_KEY, 
-            max_tokens=1024,
-            system_prompt="The user has a query about this exercise which involves repeating words vocally.",
-        )
-
-        response = ai_help.chat(
-        f"Query: {message}",
-        should_print=False,
-        clear_after_response=False
+        response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1000,
+        messages=[
+            {"role": "user", "content": f"{message}"}
+        ]
     )
-        print (response)
-        return response.content[0].text.strip()
+
+        return response.content[0].text
         
     except Exception as e:
         return f"Error: {str(e)}"
