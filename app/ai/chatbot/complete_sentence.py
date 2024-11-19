@@ -6,17 +6,30 @@ load_dotenv()
 #automatically looks for an "ANTHROPIC_API_KEY" environment variable
 client = Anthropic()
 
-def complete_sentence(data):
+def complete_sentence(data, chat, question):
     try:
         EXERCISE_DETAILS = data['exercise_details']
-        USER_REQUEST = data['user_request']
-        message = f"""
-You are an AI assistant designed to help teach literacy to adult ex-convicts. Your task is to assist with an exercise where the user is provided with a sentence containing two missing words. The user has to click on the word that they believe should go into the first gap followed by the word they think should in the second gap. If they make a mistake, they can click on the word in the sentence at the top of the page and it will return the word to the selection area. Here are the details of the exercise:
+        prompt = f"""
+You are an AI assistant designed to help teach literacy to adult ex-convicts. Your task is to assist with an exercise where the user is provided with a sentence containing two missing words. The user has to click on the word that they believe should go into the first gap followed by the word they think should in the second gap. If they make a mistake, they can click on the word in the sentence at the top of the page and it will return the word to the selection area. 
 
+Here are the details of the exercise:
 <exercise_details>
 {EXERCISE_DETAILS}
 </exercise_details>
 
+Here is a history of your chat so far.
+<chat>
+{chat}
+</chat>
+
+The user has asked the following question:
+<user_question>
+{question}
+</user_question>
+
+Follow the instructions provided inside the <instructions> tags below when answering questions.
+
+<instructions>
 Your role is to answer questions about the exercise without revealing the correct answers. Here are your guidelines:
 
 1. Always be patient, encouraging, and supportive in your responses.
@@ -32,11 +45,7 @@ When responding to a user's question, follow these steps:
 1. Carefully read and understand the user's question.
 2. Formulate a helpful response that guides the user without giving away the answers.
 3. Ensure your response is clear, concise, and encouraging.
-
-Here is the user's question:
-<user_question>
-{USER_REQUEST}
-</user_question>
+</instructions> 
 
 Provide your response to the user's question within <answer> tags. Remember to be helpful and encouraging without revealing the answers to the exercise.
 """
@@ -45,9 +54,10 @@ Provide your response to the user's question within <answer> tags. Remember to b
         model="claude-3-5-sonnet-20241022",
         max_tokens=1000,
         messages=[
-            {"role": "user", "content": f"{message}"}
+            {"role": "user", "content": prompt}        
         ]
     )
+        print(response) 
         return response.content[0].text
         
     except Exception as e:

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import jsonify, request
 from .models import Question, Exercise, Module, db
 
 def get_questions():

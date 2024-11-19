@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import jsonify
 from .models import db, Question, Exercise, QuestionType, Module
 
 def add_question(data):
