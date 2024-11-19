@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify
-from .ai_helper.repeat_words import repeat_words
+from .chatbot.repeat_words import repeat_words
 from .word_helper import get_word_help
 from .anthropic_calls import AnthropicCalls
 from .evaluate.repeat_words import evaluate_repeat_words_exercise
-from .ai_helper.complete_sentence import complete_sentence
+from .chatbot.complete_sentence import complete_sentence
+import re
 
 ai_blueprint = Blueprint('ai', __name__)
 
@@ -18,20 +19,19 @@ def word_helper_api():
     data = request.get_json()
     return get_word_help(data)
 
-@ai_blueprint.route('/helper_repeat_words', methods=['POST'])
+@ai_blueprint.route('/chatbot', methods=['POST'])
 def helper_repeat_words():
-    data = {'exercise_details': 
-            {'exercise_name': 'Reading long vowel sounds',
-             'data' : ['week', ' speak', ' happy', 'keen', 'sorry', 'cheat', 'tree'],
-             'Description': """Remember that vowel sounds can be long or short. The 
-             long vowel sounds are ā, ē, ō, ĩ and ũ', "the short ones are a, e, i, o, 
-             and u. In this activity you'll be reading words containing long vowel 
-             sounds. There are seven words for each long vowel sound and all the letter 
-             combinations you've learnt so far for each sound will feature here. Read each 
-             word as it appears on the screen"""}, 
-            'sight_words': """so work love their one over sure two knew because only woman done does other""", 
-            'user_request': 'What is the weather like in London'}
-    return jsonify(repeat_words(data))
+    return_val = None
+    data = request.get_json()
+    if data['exercise_details']['question_type'] == 'complete_sentence':
+        response = re.search(r'<answer>(.*?)</answer>', complete_sentence(data), re.DOTALL)
+        print(response)
+        return_val = {'response': response.group(1).strip()}
+    if data['exercise_details']['question_type'] == 'repeat_words':
+        response = re.search(r'<answer>(.*?)</answer>', repeat_words(data), re.DOTALL)
+        return_val = {'response': response.group(1).strip()}
+    print(return_val)
+    return return_val
 
 @ai_blueprint.route('/evaluate_repeat_words', methods=['POST'])
 def evaluate_repeat_words():
