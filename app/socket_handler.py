@@ -44,7 +44,7 @@ def init_socket_handlers(socketio: SocketIO):
 
             # Configure speech recognition
             config = cloud_speech.RecognitionConfig(
-                encoding=cloud_speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
+                # encoding=cloud_speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
                 sample_rate_hertz=16000,
                 language_code="en-GB",
                 enable_automatic_punctuation=True,
