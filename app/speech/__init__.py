@@ -2,11 +2,13 @@ from flask import Blueprint, request, jsonify
 from .word import get_word
 from .sentence import get_sentence
 from .words_with_scores import transcribe_word_scores
-from .speech import synthesize_speech_with_specific_voice
+from .text_to_speech import synthesize_speech_with_specific_voice
 from app.config import logger
 import base64
 
+
 speech_blueprint = Blueprint('speech', __name__)
+
 
 @speech_blueprint.route('/speak_text', methods=['POST'])
 def speak_text():

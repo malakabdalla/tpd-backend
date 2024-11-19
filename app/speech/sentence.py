@@ -2,7 +2,6 @@ from google.cloud.speech_v2 import SpeechClient
 from google.cloud.speech_v2.types import cloud_speech
 from app.config import PROJECT_ID, logger
 
-
 def get_sentence(audio_content: bytes, phrase: str) -> cloud_speech.RecognizeResponse:
     """Enhances speech recognition accuracy using an inline phrase set.
     Args:
