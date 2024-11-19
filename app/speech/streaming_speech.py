@@ -1,43 +1,35 @@
-from app import create_app
-from flask import Flask, request, abort
-import subprocess
-import queue, threading, base64, logging
+from flask import Blueprint
+from flask_socketio import SocketIO, emit
+from main import socketio
+import queue, threading, base64
 
-from google.cloud import speech
-from flask_socketio import SocketIO
 
-import os
+# socketio = SocketIO(
+#     app,
+#     cors_allowed_origins="*",  # More permissive for testing
+#     async_mode='threading',
+#     logger=True,
+#     engineio_logger=True,
+#     ping_timeout=60,
+#     ping_interval=25,
+#     max_http_buffer_size=1e8,
+#     always_connect=True,
+#     http_compression=False  # Disable compression for testing
+# )
 
-from google.cloud.speech_v2 import SpeechClient
-from google.cloud.speech_v2.types import cloud_speech as cloud_speech_types
+# Create a Blueprint for socket functionality
+socket_bp = Blueprint('socket_bp', __name__)
 
-PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
+# Placeholder for SocketIO reference
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+# Initialize the SocketIO reference within the module
 
-app, socketio = create_app()
 
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    if request.method == 'POST':
-        subprocess.run(['./update_repo.sh'])
-        return 'Updated', 200
-    else:
-        abort(400)
-
-socketio = SocketIO(
-    app,
-    cors_allowed_origins="*",  # More permissive for testing
-    async_mode='threading',
-    logger=True,
-    engineio_logger=True,
-    ping_timeout=60,
-    ping_interval=25,
-    max_http_buffer_size=1e8,
-    always_connect=True,
-    http_compression=False  # Disable compression for testing
-)
+# Define a socket event handler
+@socketio.on('message', namespace='/my_namespace')
+def handle_message(data):
+    print(f"Received message: {data}")
+    emit('response', {'message': 'Message received!'}, namespace='/my_namespace')
 
 active_streams = {}
 
@@ -239,6 +231,3 @@ def stop_audio_stream():
     except Exception as e:
         logger.error(f"Error in stop_audio_stream: {str(e)}")
         socketio.emit("error", {"message": str(e)}, room=request.sid)
-
-if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)

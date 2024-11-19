@@ -23,7 +23,8 @@ def get_questions_by_exercise_id(exercise_id):
         "description": questions[0][1].description,  # From Exercise
         "phonics": questions[0][2].phonics,          # From Module
         "sight_words": questions[0][2].sight_words,  # From Module
-        "other_topics": questions[0][2].other_topics # From Module
+        "other_topics": questions[0][2].other_topics, # From Module
+        "exercise_name": questions[0][1].exercise_name,  # From Exercise
     }
 
     # Creating a list of questions with relevant fields from the Question model
