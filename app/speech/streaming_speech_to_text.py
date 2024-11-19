@@ -7,10 +7,6 @@ from google.cloud.speech_v2.types import cloud_speech as cloud_speech_types
 
 socket_bp = Blueprint('socket_bp', __name__)
 
-# Define a socket event handler
-
-
-
 def register_sockets(socketio):
     active_streams = {}
     class AudioStreamHandler:

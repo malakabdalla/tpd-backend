@@ -1,12 +1,18 @@
 from flask import Blueprint, request, jsonify
 from .chatbot.repeat_words import repeat_words
 from .word_helper import get_word_help
-from .anthropic_calls import AnthropicCalls
 from .evaluate.repeat_words import evaluate_repeat_words_exercise
 from .chatbot.complete_sentence import complete_sentence
+from .chatbot.repeat_sentence import repeat_sentence
 import re
 
 ai_blueprint = Blueprint('ai', __name__)
+
+@ai_blueprint.route('/new_chat', methods=['GET'])
+def new_chat():
+    global chat
+    chat = []
+    return jsonify(chat)
 
 @ai_blueprint.route('/ai_helper', methods=['POST'])
 def ai_helper():
@@ -21,15 +27,20 @@ def word_helper_api():
 
 @ai_blueprint.route('/chatbot', methods=['POST'])
 def helper_repeat_words():
-    return_val = None
     data = request.get_json()
-    if data['exercise_details']['question_type'] == 'complete_sentence':
-        response = re.search(r'<answer>(.*?)</answer>', complete_sentence(data), re.DOTALL)
-        print(response)
+    chat.append({"role": "user", "content": data['user_request']})  # Store as a dictionary
+    
+    if data['exercise_details']['question_type'] == 'repeat_sentence':
+        response = re.search(r'<answer>(.*?)</answer>', repeat_sentence(data, chat, data['user_request']), re.DOTALL)
         return_val = {'response': response.group(1).strip()}
-    if data['exercise_details']['question_type'] == 'repeat_words':
-        response = re.search(r'<answer>(.*?)</answer>', repeat_words(data), re.DOTALL)
+    elif data['exercise_details']['question_type'] == 'complete_sentence':
+        response = re.search(r'<answer>(.*?)</answer>', complete_sentence(data, chat, data['user_request']), re.DOTALL)
         return_val = {'response': response.group(1).strip()}
+    elif data['exercise_details']['question_type'] == 'repeat_words':
+        response = re.search(r'<answer>(.*?)</answer>', repeat_words(data, chat, data['user_request']), re.DOTALL)
+        return_val = {'response': response.group(1).strip()}
+    
+    chat.append({"role": "assistant", "content": return_val['response']})  # Store as a dictionary
     print(return_val)
     return return_val
 
