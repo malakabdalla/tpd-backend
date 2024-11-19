@@ -4,8 +4,6 @@ import subprocess
 import queue, threading, base64, logging
 
 from google.cloud import speech
-from google.cloud.speech import enums
-from google.cloud.speech import types
 from flask_socketio import SocketIO
 
 logger = logging.getLogger(__name__)
