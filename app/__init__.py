@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from app.socket_handler import init_socket_handlers  # Import socket handlers
+# from app.socket_handler import init_socket_handlers  # Import socket handlers
 from .db.models import db
 from .db import db_blueprint
 from .user import user_blueprint
@@ -26,6 +26,6 @@ def create_app():
     app.register_blueprint(ai_blueprint)
 
     # Initialize socket handlers
-    init_socket_handlers(socketio)
+    # init_socket_handlers(socketio)
 
     return app, socketio
