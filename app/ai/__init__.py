@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from .ai_helper.repeat_words import repeat_words
 from .word_helper import get_word_help
 from .anthropic_calls import AnthropicCalls
-from .evaluate_exercise import evaluate_repeat_words_exercise
+from .evaluate.repeat_words import evaluate_repeat_words_exercise
 from .ai_helper.complete_sentence import complete_sentence
 
 ai_blueprint = Blueprint('ai', __name__)
