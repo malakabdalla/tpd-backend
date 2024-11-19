@@ -2,7 +2,8 @@ from flask import Blueprint, request, jsonify
 from .ai_helper.repeat_words import repeat_words
 from .word_helper import get_word_help
 from .anthropic_calls import AnthropicCalls
-from .evaluate_exercise import evaluate_repeat_words_exercise
+from .evaluate.repeat_words import evaluate_repeat_words_exercise
+from .ai_helper.complete_sentence import complete_sentence
 
 ai_blueprint = Blueprint('ai', __name__)
 
@@ -46,3 +47,12 @@ def evaluate_repeat_words():
              'User interactions': {'pay': 5, 'train': 5, 'wait': 1, 'ray': 1, 'gay': 1, 'chain': 1, 'tail': 1},
             'sight_words': """so work love their one over sure two knew because only woman done does other"""}
     return jsonify(evaluate_repeat_words_exercise(data))
+
+# @ai_blueprint.route('/helper_complete_sentence', methods=['POST'])
+# def helper_complete_sentence():
+#     data = {'exercise_details': 
+#             {'exercise_name': 'Fill in the missing words',
+#              'Description': """In this exercise, you will be asked to complete sentences 
+#              by filling in the missing words. The sentences are simple and relate to 
+#              everyday activities. Your task is to think about the context of the sentence 
+#              and choose the most appropriate word to complete it."""}, 
