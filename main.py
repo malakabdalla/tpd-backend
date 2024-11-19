@@ -4,13 +4,9 @@ import subprocess
 
 app, socketio = create_app()
 
-#test number 2
-#test 3
-
 @app.route('/webhook', methods=['POST'])
 def webhook():
     if request.method == 'POST':
-        # Run the update script
         subprocess.run(['./update_repo.sh'])
         return 'Updated', 200
     else:
