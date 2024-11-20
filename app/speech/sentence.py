@@ -28,7 +28,7 @@ def get_sentence(audio_content: bytes, phrase: str) -> cloud_speech.RecognizeRes
         auto_decoding_config=cloud_speech.AutoDetectDecodingConfig(),
         adaptation=adaptation,
         language_codes=["en-GB"],
-        model="short",
+        model="long",
         features=cloud_speech.RecognitionFeatures(
             enable_word_confidence=True,
         ),
