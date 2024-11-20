@@ -9,6 +9,8 @@ class QuestionType(enum.Enum):
     repeat_words = 'repeat_words'
     repeat_sentence = 'repeat_sentence'
     repeat_paragraph = 'repeat_paragraph'
+    complete_spelling = 'complete_spelling'
+    find_word = 'find_word'
 
 class User(db.Model):
     __tablename__ = 'users'
