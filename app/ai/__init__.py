@@ -85,7 +85,7 @@ def evaluate_repeat_words():
             "quesition_id": "ai_generated"
         }
     }
-    return jsonify(response)
+    return response
 
 # @ai_blueprint.route('/helper_complete_sentence', methods=['POST'])
 # def helper_complete_sentence():
