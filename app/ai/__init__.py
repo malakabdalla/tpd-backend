@@ -73,15 +73,16 @@ def evaluate_repeat_words():
         if add_words_match
         else None
     ) 
-    
+    logger.info(data)
+    exercise_details = data.get("exercise_details", {})
     response = {
         "response": evaluation,
         "includes_questions": bool(add_words),
         "question": {
             "data": add_words if add_words else [],
             "answer_list": add_words if add_words else [],
-            "question_type": data.get("exercise_details", {}).get("question_type", None),
-            "prompts": data.get("exercise_details", {}).get("prompts", None),
+            "question_type": data.get("exercise_details", {}).get("questions", [{}])[0].get("question_type", None),  # Access question_type safely from the first question
+            "prompts": data.get("exercise_details", {}).get("questions", [{}])[0].get("prompts", []),  
             "quesition_id": "ai_generated"
         }
     }
