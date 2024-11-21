@@ -8,9 +8,7 @@ client = Anthropic()
 
 def evaluate_repeat_words_exercise(data, chat):
     try:
-        EXERCISE_DATA = data['exercise_data']
-        QUESTIONS = data['questions']
-        MISTAKES = data['mistakes']
+        EXERCISE_DATA = data['exercise_details']
         # USER_REQUEST = data['user_request']
         prompt = f"""
 You are an AI assistant evaluating an adult learner's literacy exercise. Your task is to analyze the learner's responses, identify any words they may have struggled with, and offer additional practice if needed.
@@ -21,14 +19,7 @@ You will be provided with a JSON object containing the exercise data. Here is th
 {EXERCISE_DATA}
 </exercise_data>
 
-You will also receive a list of questions in <questions> and the answers the user got wrong in <mistakes>:
-<questions>
-{QUESTIONS}
-</questions>
-
-<user_interactions>
-{MISTAKES}
-</user_interactions>
+Inside the <exercise_data> you will find the questions asked with the mistakes made by the user.
 
 You also have a record of the chat so far:
 <chat>

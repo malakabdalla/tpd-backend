@@ -5,6 +5,7 @@ from .evaluate.repeat_words import evaluate_repeat_words_exercise
 from .chatbot.complete_sentence import complete_sentence
 from .chatbot.repeat_sentence import repeat_sentence
 import re
+from app.config import logger
 
 ai_blueprint = Blueprint('ai', __name__)
 
@@ -48,40 +49,30 @@ def helper_repeat_words():
 
     return return_val
 
-e_chat = []
 @ai_blueprint.route('/evaluate', methods=['POST'])
 def evaluate_repeat_words():
     data = request.get_json()
-    if len(e_chat) == 0:
-        e_chat.append({"role": "user", "content": "evaluate the exercise"})
-        e_chat.append({'role': 'assistant', 'content': """
+    if len(chat) == 0:
+        chat.append({"role": "user", "content": "evaluate the exercise"})
+        chat.append({'role': 'assistant', 'content': """
                        <evaluation>Great effort! I see you struggled with the words "pay" and "train". This shows good attention to getting the pronunciation just right. While you read through the remaining words smoothly, I'd be happy to provide some additional practice with similar 'ay' and 'ai' words if you'd like to strengthen those patterns even further. Would you like to try practice a few more similar words?</evaluation><add_words>day, play, stay, way, say</add_words>
                        """})
-        e_chat.append({"role": "user", "content": "evaluate the exercise"})
-        e_chat.append({'role': 'assistant', 'content': """I see you got all the questions right, great job!"""})
-        # e_chat.append({"role": "user", "content": "okay"})
-    # data = {'exercise_data': 
-    #         {'exercise_name': 'Reading long vowel sounds',
-    #          'Description': """Remember that vowel sounds can be long or short. The 
-    #          long vowel sounds are ā, ē, ō, ĩ and ũ', "the short ones are a, e, i, o, 
-    #          and u. In this activity you'll be reading words containing long vowel 
-    #          sounds. There are seven words for each long vowel sound and all the letter 
-    #          combinations you've learnt so far for each sound will feature here. Read each 
-    #          word as it appears on the screen"""},
-    #          'questions': [{'Question Number': 1, 'Question Type': 'repeat_words', 'Prompts': ['ai, ay'], 'Data': ['pay', 'train', 'wait', 'ray', 'gay', 'chain', 'tail'] }],
-    #          'User interactions': {'pay': 5, 'train': 5, 'wait': 1, 'ray': 1, 'gay': 1, 'chain': 1, 'tail': 1},
-    #         'sight_words': """so work love their one over sure two knew because only woman done does other"""}
-    result = evaluate_repeat_words_exercise(data, e_chat)
+        chat.append({"role": "user", "content": "evaluate the exercise"})
+        chat.append({'role': 'assistant', 'content': """I see you got all the questions right, great job!"""})
+        # chat.append({"role": "user", "content": "okay"})
+    result = evaluate_repeat_words_exercise(data, chat)
     print(result)
-    evaluation = re.search(r'<evaluation>(.*?)</evaluation>', result, re.DOTALL)
-
+    logger.info(result)
+    evaluation_match = re.search(r'<evaluation>(.*?)</evaluation>', result, re.DOTALL)
     add_words_match = re.search(r'<add_words>(.*?)</add_words>', result, re.DOTALL)
 
-    if add_words_match:
-        # Extract and process the content inside the <add_words> tag
-        add_words = [word.strip() for word in add_words_match.group(1).split(',')]
-    else:
-        add_words = None  # Explicitly set to None if the tag does not exist    retun_val = {'response': result}
+    # Extracting the string value or setting it to None if no match
+    evaluation = evaluation_match.group(1).strip() if evaluation_match else None
+    add_words = (
+        [word.strip() for word in add_words_match.group(1).split(',')]
+        if add_words_match
+        else None
+    ) 
     
     response = {
         "response": evaluation,
@@ -94,7 +85,7 @@ def evaluate_repeat_words():
             "quesition_id": "ai_generated"
         }
     }
-    return response
+    return jsonify(response)
 
 # @ai_blueprint.route('/helper_complete_sentence', methods=['POST'])
 # def helper_complete_sentence():
@@ -104,3 +95,16 @@ def evaluate_repeat_words():
 #              by filling in the missing words. The sentences are simple and relate to 
 #              everyday activities. Your task is to think about the context of the sentence 
 #              and choose the most appropriate word to complete it."""}, 
+
+
+    # data = {'exercise_data': 
+    #         {'exercise_name': 'Reading long vowel sounds',
+    #          'Description': """Remember that vowel sounds can be long or short. The 
+    #          long vowel sounds are ā, ē, ō, ĩ and ũ', "the short ones are a, e, i, o, 
+    #          and u. In this activity you'll be reading words containing long vowel 
+    #          sounds. There are seven words for each long vowel sound and all the letter 
+    #          combinations you've learnt so far for each sound will feature here. Read each 
+    #          word as it appears on the screen"""},
+    #          'questions': [{'Question Number': 1, 'Question Type': 'repeat_words', 'Prompts': ['ai, ay'], 'Data': ['pay', 'train', 'wait', 'ray', 'gay', 'chain', 'tail'] }],
+    #          'User interactions': {'pay': 5, 'train': 5, 'wait': 1, 'ray': 1, 'gay': 1, 'chain': 1, 'tail': 1},
+    #         'sight_words': """so work love their one over sure two knew because only woman done does other"""}
