@@ -6,8 +6,15 @@ from .chatbot.complete_sentence import complete_sentence
 from .chatbot.repeat_sentence import repeat_sentence
 import re
 from app.config import logger
+from .generator.complete_sentence import GameFillGap
 
 ai_blueprint = Blueprint('ai', __name__)
+
+@ai_blueprint.route('/generate', methods=['POST'])
+def generate():
+    data = request.json
+    response = GameFillGap(data)
+    return jsonify(response)
 
 @ai_blueprint.route('/new_chat', methods=['GET'])
 def new_chat():
