@@ -13,7 +13,7 @@ ai_blueprint = Blueprint('ai', __name__)
 @ai_blueprint.route('/generate', methods=['POST'])
 def generate():
     data = request.json
-    response = GameFillGap(data)
+    response = GameFillGap()
     return jsonify(response)
 
 @ai_blueprint.route('/new_chat', methods=['GET'])
