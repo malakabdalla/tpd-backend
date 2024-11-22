@@ -27,7 +27,59 @@ from google.cloud import texttospeech
 #     # Return the audio content as binary data
 #     return response.audio_content
 
-def synthesize_speech_with_specific_voice(ssml_text) -> None:
+import html
+
+def text_to_ssml(input) -> str:
+    """
+    Generates SSML text from plaintext.
+    Given an input filename, this function converts the contents of the text
+    file into a string of formatted SSML text. This function formats the SSML
+    string so that, when synthesized, the synthetic audio will pause for two
+    seconds between each line of the text file. This function also handles
+    special text characters which might interfere with SSML commands.
+
+    Args:
+        inputfile: name of plaintext file
+    Returns: SSML text based on plaintext input
+    """
+
+    # Parses lines of input file
+
+    # Replace special characters with HTML Ampersand Character Codes
+    # These Codes prevent the API from confusing text with
+    # SSML commands
+    # For example, '<' --> '&lt;' and '&' --> '&amp;'
+
+    escaped_lines = html.escape(input)
+
+    # Convert plaintext to SSML
+    # Wait two seconds between each address
+    ssml = "<speak>{}</speak>".format(
+        escaped_lines.replace("\n", '\n<break time="2s"/>')
+    )
+    print("escaped :::::", ssml)
+    # Return the concatenated string of ssml script
+    return ssml
+
+def make_phonemes(text):
+    print("text here ::::::: ", text)
+    text = text.replace('|a|', '<break time="100ms"/><phoneme alphabet="ipa" ph="æeɪj">a</phoneme>')
+    text = text.replace('long a', 'long <break time="100ms"/><phoneme alphabet="ipa" ph="\`æeɪj">a</phoneme>')
+    text = text.replace(' A ', '<break time="100ms"/><phoneme alphabet="x-sampa" ph="\"eIj">a</phoneme>')
+    text = text.replace(' a ', '<break time="100ms"/><phoneme alphabet="ipa" ph="\`æeɪj">a</phoneme>')
+    text = text.replace(' a,', '<phoneme alphabet="x-sampa" ph="eIj">a</phoneme>')
+    text = text.replace(' A,', '<phoneme alphabet="x-sampa" ph="eIj">a</phoneme>')
+
+    text = text.replace('|p|', '<break time="200ms"/><phoneme alphabet="ipa" ph=".pə">p</phoneme><break time="250ms"/>')
+    text = text.replace(' p,', '<phoneme alphabet="ipa" ph="pI">p</phoneme><break time="350ms"/>')
+    text = text.replace(' P ', '<phoneme alphabet="ipa" ph="pI">p</phoneme><break time="350ms"/>')
+    text = text.replace(' P,', '<phoneme alphabet="ipa" ph="pI">p</phoneme><break time="350ms"/>')
+    text = text.replace(' p..', '<phoneme alphabet="ipa" ph="pI">p</phoneme><break time="350ms"/>')
+
+    # text = text.replace('A', '<phoneme alphabet="ipa" ph="`eɪ">a</phoneme>')
+    return text
+
+def synthesize_speech_with_specific_voice(text) -> None:
     """
     Generates SSML text from plaintext.
     Given a string of SSML text and an output file name, this function
@@ -42,17 +94,23 @@ def synthesize_speech_with_specific_voice(ssml_text) -> None:
     # Instantiates a client
     client = texttospeech.TextToSpeechClient()
 
+    ssml = text_to_ssml(text)
     # Sets the text input to be synthesized
-    synthesis_input = texttospeech.SynthesisInput(ssml=ssml_text)
+    
+    phonemes = make_phonemes(ssml)
+    print("ssml :::::: ", phonemes)
+    synthesis_input = texttospeech.SynthesisInput(ssml=phonemes)
 
     # Builds the voice request, selects the language code ("en-US") and
     # the SSML voice gender ("MALE")
     voice = texttospeech.VoiceSelectionParams(
         language_code="en-GB",
         # name="en-GB-Wavenet-A",
-        # name="en-GB-Neural2-A",
+        name="en-GB-Neural2-A",
         # name="en-GB-News-G",
-        name="en-GB-News-I",
+        # name="en-GB-News-I",
+        # name="en-GB-Journey-F", not working
+        # name="en-GB-Studio-C",
         ssml_gender=texttospeech.SsmlVoiceGender.FEMALE
     )
 
