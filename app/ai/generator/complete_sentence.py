@@ -16,7 +16,7 @@ class GameConfiguration:
         "questions": [
             {
             "question_id": "[1]",
-            "question_type": "complete-sentence",
+            "question_type": "complete_sentence",
             "context": "[context category]",
             "phonics": "[sound pattern]",
             "patterns": "[spelling pattern]",
@@ -34,7 +34,7 @@ class GameConfiguration:
           "questions": [
             {
             "question_id": "1",
-            "question_type": "complete-sentence",
+            "question_type": "complete_sentence",
             "context": "Daily Activities",
             "phonics": "long 'a' sound",
             "patterns": "a_e, ai",
