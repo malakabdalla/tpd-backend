@@ -30,11 +30,11 @@ def word_helper_api():
 def helper_repeat_words():
     data = request.get_json()
     chat.append({"role": "user", "content": data['user_request']})  # Store as a dictionary
-    
+    print("exerrrrrrrr: ", data['exercise_details'])
     try:
         if data['exercise_details']['question_type'] == 'repeat_sentence':
-            response = re.search(r'<answer>(.*?)</answer>', repeat_sentence(data, chat, data['user_request']), re.DOTALL)
-            return_val = {'response': response.group(1).strip()}
+            text = re.search(r'<answer>(.*?)</answer>', repeat_sentence(data, chat, data['user_request']), re.DOTALL)
+            return_val = text.group(1).strip()
         elif data['exercise_details']['question_type'] == 'complete_sentence':
             response = re.search(r'<answer>(.*?)</answer>', complete_sentence(data, chat, data['user_request']), re.DOTALL)
             return_val = {'response': response.group(1).strip()}
@@ -42,10 +42,10 @@ def helper_repeat_words():
             response = re.search(r'<answer>(.*?)</answer>', repeat_words(data, chat, data['user_request']), re.DOTALL)
             return_val = {'response': response.group(1).strip()}
     except Exception as e:
-        return_val = {'response': f"Sorry, I couldn't understand that. Please try again"}
+        return_val = {'response': f"Nope, there was an error"}
                       
     chat.append({"role": "assistant", "content": return_val['response']}) 
-    print(return_val)
+    print("----------------------",return_val)
 
     return return_val
 
