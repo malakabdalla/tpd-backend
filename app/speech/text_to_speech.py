@@ -32,6 +32,7 @@ import boto3
 import os
 from openai import OpenAI
 import dotenv
+import io
 
 dotenv.load_dotenv()
 aws_key = os.getenv("AWS_ACCESS_KEY_ID")
@@ -81,7 +82,7 @@ def make_phonemes(text):
     print(text)
     return text
 
-def synthesize_speech_with_specific_voice(text) -> None:
+def synthesize_speech_with_specific_voice(text) -> bytes:
 
 
     # Instantiates a client
@@ -130,10 +131,12 @@ def synthesize_speech_with_specific_voice(text) -> None:
     # Sets the text input to be synthesized
     client = OpenAI()
     response = client.audio.speech.create(
-    model="tts-1",
-    voice="fable",
-    input=text,
-)
+        model="tts-1",
+        voice="alloy",
+        response_format="opus",
+        input=text,
+    )
 
-    audio = response.read()
-    return audio
+    # response.stream_to_file("output.mp3")
+    audio_stream = io.BytesIO(response.read())
+    return audio_stream.read()

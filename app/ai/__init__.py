@@ -18,9 +18,7 @@ def generate():
 
 @ai_blueprint.route('/new_chat', methods=['GET'])
 def new_chat():
-    global chat
-    chat = []
-    return jsonify(chat)
+    print("New chat")
 
 @ai_blueprint.route('/ai_helper', methods=['POST'])
 def ai_helper():
@@ -34,32 +32,25 @@ def word_helper_api():
     return get_word_help(data)
 
 @ai_blueprint.route('/chatbot', methods=['POST'])
-def helper_repeat_words():
+def chatbot_endpoint():
     data = request.get_json()
-    chat.append({"role": "user", "content": data['user_request']})  # Store as a dictionary
+    chat = data.get('chat', [])
     try:
         response = chatbot(data, chat, data['user_request'])  # Ensure chatbot returns valid data
         if response:
-            return_val = {'response': response}
+            return_val = {'response': response, 'chat': chat}
         else:
-            return_val = {'response': "No valid answer found"}
+            return_val = {'response': "No valid answer found", 'chat': chat}
     except Exception as e:
         print("Error during chatbot processing:", e)
-        return_val = {'response': "Nope, there was an error"}
+        return_val = {'response': "Nope, there was an error", 'chat': chat}
 
     return return_val
 
 @ai_blueprint.route('/evaluate', methods=['POST'])
 def evaluate_repeat_words():
     data = request.get_json()
-    if len(chat) == 0:
-        chat.append({"role": "user", "content": "evaluate the exercise"})
-        chat.append({'role': 'assistant', 'content': """
-                       <evaluation>Great effort! I see you struggled with the words "pay" and "train". This shows good attention to getting the pronunciation just right. While you read through the remaining words smoothly, I'd be happy to provide some additional practice with similar 'ay' and 'ai' words if you'd like to strengthen those patterns even further. Would you like to try practice a few more similar words?</evaluation><add_words>day, play, stay, way, say</add_words>
-                       """})
-        chat.append({"role": "user", "content": "evaluate the exercise"})
-        chat.append({'role': 'assistant', 'content': """I see you got all the questions right, great job!"""})
-        # chat.append({"role": "user", "content": "okay"})
+    chat = data.get('chat', [])
     result = eval_repeat_words(data, chat)
     print(result)
     logger.info(result)
@@ -74,7 +65,6 @@ def evaluate_repeat_words():
         else None
     ) 
     logger.info(data)
-    exercise_details = data.get("exercise_details", {})
     response = {
         "response": evaluation,
         "includes_questions": bool(add_words),
