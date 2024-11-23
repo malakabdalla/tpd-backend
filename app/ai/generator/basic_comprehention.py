@@ -55,7 +55,7 @@ class Game2Configuration:
                 },
                 "correct_answer": "b",
                 "hint": "Look for specific mentions of sports in the text.",
-                "explanation": "The text clearly states that Maria wanted to become a tennis champion, making tennis the central sport discussed."
+                "explanation": "The text clearly states that Katy wanted to become a tennis champion, making tennis the central sport discussed."
                 }
             ]
             }"""
@@ -65,7 +65,10 @@ class ComprehensionGenerator:
         load_dotenv()
         self.client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
         self.config = Game2Configuration()
-        self.q_number = 2
+        self.q_number = 3
+        self.focus_words_nbr = 5
+        self.words_in_text = 60
+    
         self.q_types = """
         - Basic comprehension
         - Vocabulary understanding
@@ -76,7 +79,7 @@ class ComprehensionGenerator:
         return f"""
             STEP 1:
             Please generate the interesing text for reading with topic about {topic}. Text must be suitable for target group. 20-30 words in the text.
-            Use exactly 3 words from this list:
+            Use exactly {self.focus_words_nbr} words from this list:
             <focus words>
             {focus_words}
             </focus words>
@@ -93,7 +96,7 @@ class ComprehensionGenerator:
             - Multiple choice options (4 choices)
             - The correct answer
             - Hint, 10-20 words in the hint text
-            - Explanation why this answer is correct, 15-20 words in Explanation text
+            - Explanation why this answer is correct, around {self.words_in_text} words in Explanation text
             - list of sight words used in the text
             Return response in this exact JSON structure:
             <JSON structure>
@@ -128,12 +131,12 @@ class ComprehensionGenerator:
         except Exception as e:
             return f"Error in generate_exercises: {str(e)}"
 
-def GameComprehension():
+def GameComprehension(hard_words):
     try:
-        hard_words_level_3 = ["so", "work", "love", "their", "one", "over", "sure", "two", "knew", "because", "only", "woman", "done", "does", "other"]
+        hard_words_level3 = ["so", "work", "love", "their", "one", "over", "sure", "two", "knew", "because", "only", "woman", "done", "does", "other"]
         hard_words_phonics_3 = ["burn", "hurt", "church", "blur", "curl", "fur", "furnish", "Thursday", "turn", "slur", "surf", "burst"]
 
-        focus_words = hard_words_level_3
+        focus_words = hard_words
         topic = "sport"
 
         generator = ComprehensionGenerator()
@@ -146,14 +149,12 @@ def GameComprehension():
         # print(f"json {result_json}/n/n")
 
         # with open('game3_questions.json', 'w') as json_file:
-        #     json.dump(result_frontend_json, json_file, indent=4)
+        #     json.dump(result_json, json_file, indent=4)
         # print(result_json)
         return result_json
     except Exception as e:
         return f"Error: {str(e)}"
     
-if __name__ == "__main__":
-    GameComprehension()
 
 
 
