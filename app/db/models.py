@@ -49,7 +49,6 @@ users = [
         milestone_completed=3,
         exercise_completed=12,
         question_completed=40,
-        password_hash=generate_password_hash("password123"),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
     ),
@@ -65,7 +64,6 @@ users = [
         milestone_completed=5,
         exercise_completed=20,
         question_completed=60,
-        password_hash=generate_password_hash("securepass456"),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
     ),
@@ -81,7 +79,6 @@ users = [
         milestone_completed=2,
         exercise_completed=10,
         question_completed=25,
-        password_hash=generate_password_hash("password789"),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
     ),
@@ -97,7 +94,6 @@ users = [
         milestone_completed=4,
         exercise_completed=18,
         question_completed=50,
-        password_hash=generate_password_hash("diana2023"),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
     ),
@@ -113,7 +109,6 @@ users = [
         milestone_completed=6,
         exercise_completed=25,
         question_completed=70,
-        password_hash=generate_password_hash("emilyrules"),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
     ),
@@ -129,7 +124,6 @@ users = [
         milestone_completed=7,
         exercise_completed=30,
         question_completed=80,
-        password_hash=generate_password_hash("chessmaster"),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
     ),
@@ -145,7 +139,6 @@ users = [
         milestone_completed=7,
         exercise_completed=30,
         question_completed=90,
-        password_hash=generate_password_hash("AIenthusiate"),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
     ),
@@ -161,7 +154,6 @@ users = [
         milestone_completed=7,
         exercise_completed=30,
         question_completed=80,
-        password_hash=generate_password_hash("Afghanyman"),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
     ),
@@ -177,7 +169,6 @@ users = [
         milestone_completed=7,
         exercise_completed=30,
         question_completed=80,
-        password_hash=generate_password_hash("MMOalways"),
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
     )
