@@ -179,7 +179,7 @@ class User(db.Model):
 #     db.session.add(user)
 
 # Commit to save the users
-db.session.commit()
+# db.session.commit()
 
 class Module(db.Model):
     __tablename__ = 'module'
