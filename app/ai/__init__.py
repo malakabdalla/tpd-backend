@@ -51,6 +51,7 @@ def chatbot_endpoint():
 def evaluate_repeat_words():
     data = request.get_json()
     chat = data.get('chat', [])
+    print(chat)
     result = eval_repeat_words(data, chat)
     print(result)
     logger.info(result)
