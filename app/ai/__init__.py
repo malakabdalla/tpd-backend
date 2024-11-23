@@ -58,7 +58,6 @@ def evaluate_repeat_words():
     evaluation_match = re.search(r'<evaluation>(.*?)</evaluation>', result, re.DOTALL)
     add_words_match = re.search(r'<add_words>(.*?)</add_words>', result, re.DOTALL)
 
-    # Extracting the string value or setting it to None if no match
     evaluation = evaluation_match.group(1).strip() if evaluation_match else None
     add_words = (
         [word.strip() for word in add_words_match.group(1).split(',')]
@@ -78,25 +77,3 @@ def evaluate_repeat_words():
         }
     }
     return response
-
-# @ai_blueprint.route('/helper_complete_sentence', methods=['POST'])
-# def helper_complete_sentence():
-#     data = {'exercise_details': 
-#             {'exercise_name': 'Fill in the missing words',
-#              'Description': """In this exercise, you will be asked to complete sentences 
-#              by filling in the missing words. The sentences are simple and relate to 
-#              everyday activities. Your task is to think about the context of the sentence 
-#              and choose the most appropriate word to complete it."""}, 
-
-
-    # data = {'exercise_data': 
-    #         {'exercise_name': 'Reading long vowel sounds',
-    #          'Description': """Remember that vowel sounds can be long or short. The 
-    #          long vowel sounds are ā, ē, ō, ĩ and ũ', "the short ones are a, e, i, o, 
-    #          and u. In this activity you'll be reading words containing long vowel 
-    #          sounds. There are seven words for each long vowel sound and all the letter 
-    #          combinations you've learnt so far for each sound will feature here. Read each 
-    #          word as it appears on the screen"""},
-    #          'questions': [{'Question Number': 1, 'Question Type': 'repeat_words', 'Prompts': ['ai, ay'], 'Data': ['pay', 'train', 'wait', 'ray', 'gay', 'chain', 'tail'] }],
-    #          'User interactions': {'pay': 5, 'train': 5, 'wait': 1, 'ray': 1, 'gay': 1, 'chain': 1, 'tail': 1},
-    #         'sight_words': """so work love their one over sure two knew because only woman done does other"""}
