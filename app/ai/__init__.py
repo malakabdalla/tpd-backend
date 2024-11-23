@@ -14,7 +14,7 @@ ai_blueprint = Blueprint('ai', __name__)
 @ai_blueprint.route('/final', methods=['POST'])
 def final():
     data = request.json
-    response = GameComprehension()
+    response = GameComprehension(data['hard_words'])
     return jsonify(response)
 
 @ai_blueprint.route('/generate', methods=['POST'])
