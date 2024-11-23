@@ -31,3 +31,16 @@ def get_question_by_exercise_id_route():
     exercise_id = request.args.get('exercise_id')
     logger.debug(f"exercise_id: {exercise_id}")
     return get_questions_by_exercise_id(exercise_id)
+
+@db_blueprint.route('/add_hard_words', methods=['POST'])
+def add_hard_words():
+    data = request.get_json()
+    module_id = data.get('module_id')
+    exercise_id = data.get('exercise_id')
+    hard_words = data.get('hard_words')
+    return add_hard_words(module_id, exercise_id, hard_words)
+
+@db_blueprint.route('/get_hard_words', methods=['GET'])
+def get_hard_words():
+    module_id = request.args.get('module_id')
+    return get_hard_words(module_id)

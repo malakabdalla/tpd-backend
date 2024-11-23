@@ -7,8 +7,15 @@ from .chatbot.chat import chatbot
 import re
 from app.config import logger
 from .generator.gen_complete_sentence import GameFillGap
+from .generator.basic_comprehention import GameComprehension
 
 ai_blueprint = Blueprint('ai', __name__)
+
+@ai_blueprint.route('/final', methods=['POST'])
+def final():
+    data = request.json
+    response = GameComprehension()
+    return jsonify(response)
 
 @ai_blueprint.route('/generate', methods=['POST'])
 def generate():

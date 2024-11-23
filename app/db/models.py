@@ -33,6 +33,162 @@ class User(db.Model):
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     answers = db.relationship('Answer', back_populates='user')
+    
+
+# Dummy data for users
+users = [
+    User(
+        first_name="Alice",
+        last_name="Smith",
+        age=25,
+        gender="Female",
+        ethnicity="Caucasian",
+        first_language="English",
+        interests="Reading, Hiking, Yoga",
+        personal_goals="Become proficient in Python programming.",
+        milestone_completed=3,
+        exercise_completed=12,
+        question_completed=40,
+        password_hash=generate_password_hash("password123"),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    ),
+    User(
+        first_name="Bob",
+        last_name="Johnson",
+        age=30,
+        gender="Male",
+        ethnicity="African American",
+        first_language="English",
+        interests="Gaming, Basketball, Coding",
+        personal_goals="Improve problem-solving skills.",
+        milestone_completed=5,
+        exercise_completed=20,
+        question_completed=60,
+        password_hash=generate_password_hash("securepass456"),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    ),
+    User(
+        first_name="Carlos",
+        last_name="Martinez",
+        age=28,
+        gender="Male",
+        ethnicity="Hispanic",
+        first_language="Spanish",
+        interests="Soccer, Cooking, Technology",
+        personal_goals="Learn cloud computing.",
+        milestone_completed=2,
+        exercise_completed=10,
+        question_completed=25,
+        password_hash=generate_password_hash("password789"),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    ),
+    User(
+        first_name="Diana",
+        last_name="Lee",
+        age=23,
+        gender="Female",
+        ethnicity="Asian",
+        first_language="Korean",
+        interests="Painting, Running, Reading",
+        personal_goals="Master data analysis techniques.",
+        milestone_completed=4,
+        exercise_completed=18,
+        question_completed=50,
+        password_hash=generate_password_hash("diana2023"),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    ),
+    User(
+        first_name="Emily",
+        last_name="Williams",
+        age=35,
+        gender="Female",
+        ethnicity="Mixed",
+        first_language="English",
+        interests="Traveling, Music, Gardening",
+        personal_goals="Develop leadership skills.",
+        milestone_completed=6,
+        exercise_completed=25,
+        question_completed=70,
+        password_hash=generate_password_hash("emilyrules"),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    ),
+    User(
+        first_name="Frank",
+        last_name="O'Connor",
+        age=40,
+        gender="Male",
+        ethnicity="Caucasian",
+        first_language="English",
+        interests="Writing, Philosophy, Chess",
+        personal_goals="Publish a book.",
+        milestone_completed=7,
+        exercise_completed=30,
+        question_completed=80,
+        password_hash=generate_password_hash("chessmaster"),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    ),
+    User(
+        first_name="sam",
+        last_name="david",
+        age=30,
+        gender="Male",
+        ethnicity="Arab",
+        first_language="Arabic",
+        interests="Writing, Reading, WATCHING VIDEOS",
+        personal_goals="Make an Ai App.",
+        milestone_completed=7,
+        exercise_completed=30,
+        question_completed=90,
+        password_hash=generate_password_hash("AIenthusiate"),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    ),
+    User(
+        first_name="Katherine",
+        last_name="Oldcorner",
+        age=40,
+        gender="Female",
+        ethnicity="Afghan",
+        first_language="Afghany",
+        interests="Writing, Philosophy, Chess",
+        personal_goals="a happy family.",
+        milestone_completed=7,
+        exercise_completed=30,
+        question_completed=80,
+        password_hash=generate_password_hash("Afghanyman"),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    ),
+    User(
+        first_name="Joseph",
+        last_name="Nugyen",
+        age=23,
+        gender="Male",
+        ethnicity="vitnamese",
+        first_language="English"    ,
+        interests="computing, pottery, playing video games",
+        personal_goals="be a streamer.",
+        milestone_completed=7,
+        exercise_completed=30,
+        question_completed=80,
+        password_hash=generate_password_hash("MMOalways"),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
+]
+
+# Add to database session
+for user in users:
+    db.session.add(user)
+
+# Commit to save the users
+db.session.commit()
 
 class Module(db.Model):
     __tablename__ = 'module'
@@ -91,11 +247,14 @@ class Answer(db.Model):
     audio_path = db.Column(db.String, nullable=True)
     created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
-
+    hard_words = db.Column(db.Text)
+                           
     user = db.relationship('User', back_populates='answers')
     question = db.relationship('Question', back_populates='answers_rel')
     exercise = db.relationship('Exercise', back_populates='answers')
     module = db.relationship('Module', back_populates='answers')
+
+    
 
 # Additional setup to ensure the `back_populates` work as expected
 Module.answers = db.relationship('Answer', back_populates='module')
