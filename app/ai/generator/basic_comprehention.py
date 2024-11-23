@@ -66,8 +66,8 @@ class ComprehensionGenerator:
         self.client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
         self.config = Game2Configuration()
         self.q_number = 3
-        self.focus_words_nbr = 5
-        self.words_in_text = 60
+        self.focus_words_nbr = 3
+        self.words_in_text = 40
     
         self.q_types = """
         - Basic comprehension
