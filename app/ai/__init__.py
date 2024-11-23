@@ -1,12 +1,12 @@
 from flask import Blueprint, request, jsonify
-from .chatbot.repeat_words import repeat_words
 from .word_helper import get_word_help
-from .evaluate.repeat_words import evaluate_repeat_words_exercise
-from .chatbot.complete_sentence import complete_sentence
-from .chatbot.repeat_sentence import repeat_sentence
+from .evaluate.eval_repeat_words import eval_repeat_words
+from .chatbot.chat_complete_sentence import chat_complete_sentence
+from .chatbot.chat_repeat_sentence import chat_repeat_sentence
+from .chatbot.chat import chatbot
 import re
 from app.config import logger
-from .generator.complete_sentence import GameFillGap
+from .generator.gen_complete_sentence import GameFillGap
 
 ai_blueprint = Blueprint('ai', __name__)
 
@@ -37,22 +37,15 @@ def word_helper_api():
 def helper_repeat_words():
     data = request.get_json()
     chat.append({"role": "user", "content": data['user_request']})  # Store as a dictionary
-    print("exerrrrrrrr: ", data['exercise_details'])
     try:
-        if data['exercise_details']['question_type'] == 'repeat_sentence':
-            text = re.search(r'<answer>(.*?)</answer>', repeat_sentence(data, chat, data['user_request']), re.DOTALL)
-            return_val = text.group(1).strip()
-        elif data['exercise_details']['question_type'] == 'complete_sentence':
-            response = re.search(r'<answer>(.*?)</answer>', complete_sentence(data, chat, data['user_request']), re.DOTALL)
-            return_val = {'response': response.group(1).strip()}
-        elif data['exercise_details']['question_type'] == 'repeat_words':
-            response = re.search(r'<answer>(.*?)</answer>', repeat_words(data, chat, data['user_request']), re.DOTALL)
-            return_val = {'response': response.group(1).strip()}
+        response = chatbot(data, chat, data['user_request'])  # Ensure chatbot returns valid data
+        if response:
+            return_val = {'response': response}
+        else:
+            return_val = {'response': "No valid answer found"}
     except Exception as e:
-        return_val = {'response': f"Nope, there was an error"}
-                      
-    chat.append({"role": "assistant", "content": return_val['response']}) 
-    print("----------------------",return_val)
+        print("Error during chatbot processing:", e)
+        return_val = {'response': "Nope, there was an error"}
 
     return return_val
 
@@ -67,7 +60,7 @@ def evaluate_repeat_words():
         chat.append({"role": "user", "content": "evaluate the exercise"})
         chat.append({'role': 'assistant', 'content': """I see you got all the questions right, great job!"""})
         # chat.append({"role": "user", "content": "okay"})
-    result = evaluate_repeat_words_exercise(data, chat)
+    result = eval_repeat_words(data, chat)
     print(result)
     logger.info(result)
     evaluation_match = re.search(r'<evaluation>(.*?)</evaluation>', result, re.DOTALL)

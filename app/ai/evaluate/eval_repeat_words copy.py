@@ -6,7 +6,7 @@ load_dotenv()
 #automatically looks for an "ANTHROPIC_API_KEY" environment variable
 client = Anthropic()
 
-def evaluate_repeat_words_exercise(data):
+def eval_repeat_words_exercise(data):
     try:
         EXERCISE_DATA = data['exercise_data']
         QUESTIONS = data['questions']

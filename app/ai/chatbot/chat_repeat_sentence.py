@@ -6,7 +6,7 @@ load_dotenv()
 #automatically looks for an "ANTHROPIC_API_KEY" environment variable
 client = Anthropic()
 
-def repeat_sentence(data, chat, question):
+def chat_repeat_sentence(data, chat, question):
     try:
         EXERCISE_DETAILS = data['exercise_details']
         prompt = f"""

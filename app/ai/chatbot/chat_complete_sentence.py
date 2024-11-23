@@ -6,7 +6,7 @@ load_dotenv()
 #automatically looks for an "ANTHROPIC_API_KEY" environment variable
 client = Anthropic()
 
-def complete_sentence(data, chat, question):
+def chat_complete_sentence(data, chat, question):
     try:
         EXERCISE_DETAILS = data['exercise_details']
         prompt = f"""
@@ -54,7 +54,7 @@ Provide your response to the user's question within <answer> tags. Remember to b
 
         response = client.messages.create(
         model="claude-3-5-sonnet-20241022",
-        max_tokens=1000,
+        max_tokens=10000,
         messages=[
             {"role": "user", "content": prompt}        
         ]

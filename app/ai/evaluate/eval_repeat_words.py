@@ -6,7 +6,7 @@ load_dotenv()
 #automatically looks for an "ANTHROPIC_API_KEY" environment variable
 client = Anthropic()
 
-def evaluate_repeat_words_exercise(data, chat):
+def eval_repeat_words(data, chat):
     try:
         EXERCISE_DATA = data['exercise_details']
         # USER_REQUEST = data['user_request']
@@ -26,7 +26,7 @@ You also have a record of the chat so far:
 {chat}
 </chat>
 
-Follow these steps to complete the evaluation:
+Follow these steps to complete the evaluation:`
 
 1. Parse the JSON object to extract the exercise description and the list of user responses.
 
